@@ -20,7 +20,6 @@ module Leafman; extend self
         File.open(File.join(File.expand_path(PROJECT_DIR), ".leafman"), "w") {|f| f.write YAML.dump(@ldb)}
     end
     def parse_args(*argv)
-        puts "\e[1m\e[36mL \e[32mE \e[33mA \e[36mF \e[32mM \e[33mA \e[36mN\e[0m, The GREEN MEAN Managing MACHINE!" if argv[0] =~ /^init$/i
         load_ldb rescue warn("\e[33mCould not load the Leafman database. Ignore this if you are running an INIT.\e[0m")
         case argv[0]
             when /^init$/i
@@ -36,11 +35,24 @@ module Leafman; extend self
             when /^fork$/i
                 git_fork argv[1], argv[2]
             when /^sync$/i
-                git_sync_all
+                sync_all
             when /^svn-get$/i
                 svn_get argv[1], argv[2]
             when /^help$/i
-                puts "\e[1mNo help yet. Coming in a future release\e[0m"
+                puts "\e[1m\e[36mL \e[32mE \e[33mA \e[36mF \e[32mM \e[33mA \e[36mN\e[0m, The GREEN MEAN Managing MACHINE!"
+                puts "\e[1m\e[34mUsage:\e[0m ruby leafman.rb <command> [parameters...]"
+                puts
+                puts "\e[1m\e[34mCommand List:\e[0m"
+                puts "\e[1minit\e[0m \e[33m# initialize the project directories for first time\e[0m"
+                puts "\e[1mcreate\e[0m <project-name> \e[33m# create a new project called <project-name>\e[0m"
+                puts "\e[1mdestroy\e[0m <project-name> \e[33m# destroy the project called <project-name>\e[0m"
+                puts "\e[1mlist\e[0m \e[33m# list of all projects\e[0m"
+                puts "\e[1mshow\e[0m <project-name> \e[33m# show everything known about the project called <project-name>\e[0m"
+                puts "\e[1mfork\e[0m <project-name> <git-url> \e[33m# fork the GIT project called <project-name> at <git-url>\e[0m"
+                puts "\e[1msync\e[0m \e[33m# synchronize all GIT and SVN projects with the server\e[0m"
+                puts "\e[1msvn-get\e[0m <project-name> <svn-url> \e[33m# checkout the SVN project called <project-name at <svn-url>\e[0m"
+                puts
+                puts "\e[1m\e[34mCreated by ~devyn\e[0m"
             else
                 warn "\e[31m\e[1mInvalid command.\e[0m"
         end
@@ -91,7 +103,7 @@ module Leafman; extend self
         puts "\e[32m\e[1mdone!\e[0m"
         return true
     end
-    def git_sync_all
+    def sync_all
         puts "\e[1mSyncing all GIT repositories...\e[0m"
         @ldb['projects'].select{|p|p['scm']=='git'}.each do |p|
             puts "\e[1msync:\e[0m #{p['name']}"
