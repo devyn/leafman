@@ -1,3 +1,4 @@
+#!/usr/bin/env ruby
 # Leafman: The GREEN MEAN Managing MACHINE!
 #     $ ruby leafman.rb init # Initialize the directories, etc. Use for first time.
 #     $ ruby leafman.rb create MyProject # make an empty project with name MyProject
@@ -5,7 +6,8 @@
 #     $ ruby leafman.rb list # Project Listing
 #     $ ruby leafman.rb show MyProject # show all information about MyProject
 #     $ ruby leafman.rb fork OtherProject git://example.com/otherproject.git # clone the repository named OtherProject using GIT at git://example.com/otherproject.git
-#     $ ruby leafman.rb sync # fetches all changes from the server using GIT.
+#     $ ruby leafman.rb sync # fetches all changes from the server using GIT or SVN.
+#     $ ruby leafman.rb svn-get OtherProject svn://example.com/otherproject # checkout the repository named OtherProject using SVN at svn://example.com/otherproject
 
 require 'yaml'
 require 'fileutils'
@@ -35,6 +37,8 @@ module Leafman; extend self
                 git_fork argv[1], argv[2]
             when /^sync$/i
                 git_sync_all
+            when /^svn-get$/i
+                svn_get argv[1], argv[2]
             when /^help$/i
                 puts "\e[1mNo help yet. Coming in a future release\e[0m"
             else
@@ -95,6 +99,21 @@ module Leafman; extend self
                 system("git", "pull", p['fetch']) or warn("\e[31m\e[1mcould not pull for\e[0m #{p['name']}")
             end
         end
+        puts "\e[1mSyncing all SVN repositories...\e[0m"
+        @ldb['projects'].select{|p|p['scm']=='svn'}.each do |p|
+            puts "\e[1msync:\e[0m #{p['name']}"
+            Dir.chdir(File.join(File.expand_path(PROJECT_DIR), p['name'])) do
+                system("svn", "up") or warn("\e[31m\e[1mcould not update\e[0m #{p['name']}")
+            end
+        end
+        puts "\e[32m\e[1mdone!\e[0m"
+    end
+    def svn_get(pname, svn_url)
+        puts "\e[1msvn-get:\e[0m #{pname} \e[1mfrom:\e[0m #{svn_url}"
+        puts "\e[1mCheckout\e[0m #{svn_url} \e[1minto\e[0m #{File.join(File.expand_path(PROJECT_DIR), pname)}"
+        return warn("\e[31m\e[1msvn checkout failed.\e[0m") unless system("svn", "checkout", svn_url, File.join(File.expand_path(PROJECT_DIR), pname))
+        puts "\e[1madd\e[0m #{pname} \e[1mto database as SVN repository\e[0m"
+        @ldb['projects'] << {'name' => pname, 'type' => nil, 'scm' => 'svn'}
         puts "\e[32m\e[1mdone!\e[0m"
     end
 end
