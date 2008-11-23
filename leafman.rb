@@ -69,6 +69,8 @@ module Leafman; extend self
                 skel_ruby *argv
             when /^skel-shoes$/i
                 skel_shoes *argv
+            when /^skel-rails$/i
+                skel_rails *argv
             when /^import$/i
                 proj_import *argv
             when /^import-git$/i
@@ -102,6 +104,7 @@ module Leafman; extend self
                 puts "\e[1mhg-init\e[0m <project-name> \e[33m# setup the project called <project-name> for Mercurial\e[0m"
                 puts "\e[1mskel-ruby\e[0m <project-name> [classes...] \e[33m# make a ruby skeleton for <project-name> and change the type to 'ruby'\e[0m"
                 puts "\e[1mskel-shoes\e[0m <project-name> \e[33m# make a shoes skeleton for <project-name> and change the type to 'shoes'\e[0m"
+                puts "\e[1mskel-rails\e[0m <project-name> [rails-command-opts...] \e[33m# make a ruby on rails skeleton for <project-name> and change the type to 'rails'\e[0m"
                 puts "\e[1mimport\e[0m <directory> \e[33m# import a project from elsewhere on the filesystem\e[0m"
                 puts "\e[1mimport-git\e[0m <directory> \e[33m# import a Git project from elsewhere on the filesystem\e[0m"
                 puts "\e[1mimport-svn\e[0m <directory> \e[33m# import a Subversion project from elsewhere on the filesystem\e[0m"
@@ -293,6 +296,19 @@ module Leafman; extend self
         end
         puts "\e[1mchange type to\e[0m shoes"
         @ldb['projects'].select{|p|p['name']==pname}.first['type'] = 'shoes'
+        puts "\e[32m\e[1mdone!\e[0m"
+    end
+    def skel_rails(pname, *rails_opts)
+        puts "\e[1mskel-rails:\e[0m #{pname}"
+        puts "\e[1mrun \e[0m'rails'\e[1m on project dir\e[0m"
+        Dir.chdir(File.join(File.expand_path(PROJECT_DIR), pname)) do
+            run = ["rails"]
+            run += rails_opts
+            run << "."
+            system *run
+        end
+        puts "\e[1mchange type to\e[0m rails"
+        @ldb['projects'].select{|p|p['name']==pname}.first['type'] = 'rails'
         puts "\e[32m\e[1mdone!\e[0m"
     end
     def proj_import(dir)
