@@ -114,6 +114,10 @@ module Leafman; extend self
                 proj_import_bzr *argv
             when /^import-hg$/i
                 proj_import_hg *argv
+            when /^file-bug$/i
+                file_bug *argv
+            when /^file-todo$/i
+                file_todo *argv
             when /^colors$/i
                 @config['colors'] = ((argv.first =~ /^on$/i) ? true : false)
             when /^help$/i, nil
@@ -143,6 +147,8 @@ module Leafman; extend self
                 puts "\e[1mimport-svn\e[0m <directory> \e[33m# import a Subversion project from elsewhere on the filesystem\e[0m"
                 puts "\e[1mimport-bzr\e[0m <directory> \e[33m# import a Bazaar project from elsewhere on the filesystem\e[0m"
                 puts "\e[1mimport-hg\e[0m <directory> \e[33m# import a Mercurial project from elsewhere on the filesystem\e[0m"
+                puts "\e[1mfile-bug\e[0m <project-name> \e[33m# add a BUG to <project-name>\e[0m"
+                puts "\e[1mfile-todo\e[0m <project-name> \e[33m# add a TODO to <project-name>\e[0m"
                 puts
                 puts "\e[1m\e[34mconfig commands:\e[0m"
                 puts "\e[1mcolors\e[0m on|off \e[33m# turn ANSI escape sequences on or off\e[0m"
@@ -215,6 +221,12 @@ EOF
         puts "...\tuses \e[36m\e[1mMercurial\e[0m#{" and pulls" if p['do_pull']}." if p['scm'] == 'hg'
         puts "...\tdoesn't have \e[1mversion control\e[0m." unless p['scm']
         puts "...\tis a \e[1m#{p['type'].capitalize}\e[0m project." if p['type']
+        p['bugs'].each do |b|
+            puts "...\t\e[1mbug:\e[0m #{b}"
+        end if p['bugs']
+        p['todos'].each do |t|
+            puts "...\t\e[1mtodo:\e[0m #{t}"
+        end if p['todos']
         return true
     end
     def git_fork(pname, git_url)
@@ -344,6 +356,7 @@ EOF
         puts "\e[1mchange type to\e[0m ruby"
         p['type'] = 'ruby'
         puts "\e[32m\e[1mdone!\e[0m"
+        return true
     end
     def skel_shoes(pname)
         puts "\e[1mskel-shoes:\e[0m #{pname}"
@@ -356,6 +369,7 @@ EOF
         puts "\e[1mchange type to\e[0m shoes"
         p['type'] = 'shoes'
         puts "\e[32m\e[1mdone!\e[0m"
+        return true
     end
     def skel_rails(pname, *rails_opts)
         puts "\e[1mskel-rails:\e[0m #{pname}"
@@ -371,6 +385,7 @@ EOF
         puts "\e[1mchange type to\e[0m rails"
         p['type'] = 'rails'
         puts "\e[32m\e[1mdone!\e[0m"
+        return true
     end
     def proj_import(dir)
         puts "\e[1mimport:\e[0m #{File.basename(dir)}"
@@ -378,6 +393,7 @@ EOF
         puts "\e[1mcreate project config\e[0m"
         Projects.add(File.basename(dir), 'type' => nil, 'scm' => nil)
         puts "\e[32m\e[1mdone!\e[0m"
+        return true
     end
     def proj_import_git(dir)
         puts "\e[1mimport-git:\e[0m #{File.basename(dir)}"
@@ -385,6 +401,7 @@ EOF
         puts "\e[1mcreate project config\e[0m"
         Projects.add(File.basename(dir), 'type' => nil, 'scm' => 'git')
         puts "\e[32m\e[1mdone!\e[0m"
+        return true
     end
     def proj_import_svn(dir)
         puts "\e[1mimport-svn:\e[0m #{File.basename(dir)}"
@@ -392,6 +409,7 @@ EOF
         puts "\e[1mcreate project config\e[0m"
         Projects.add(File.basename(dir), 'type' => nil, 'scm' => 'svn')
         puts "\e[32m\e[1mdone!\e[0m"
+        return true
     end
     def proj_import_bzr(dir)
         puts "\e[1mimport-bzr:\e[0m #{File.basename(dir)}"
@@ -399,6 +417,7 @@ EOF
         puts "\e[1mcreate project config\e[0m"
         Projects.add(File.basename(dir), 'type' => nil, 'scm' => 'bzr')
         puts "\e[32m\e[1mdone!\e[0m"
+        return true
     end
     def proj_import_hg(dir)
         puts "\e[1mimport-hg:\e[0m #{File.basename(dir)}"
@@ -406,6 +425,25 @@ EOF
         puts "\e[1mcreate project config\e[0m"
         Projects.add(File.basename(dir), 'type' => nil, 'scm' => 'hg')
         puts "\e[32m\e[1mdone!\e[0m"
+        return true
+    end
+    def file_bug(pname, bug)
+        puts "\e[1mfile-bug:\e[0m #{pname}"
+        p = Projects.find(pname)
+        return(warn("\e[31m\e[1mproject not found.\e[0m")) unless p
+        p['bugs'] = [] unless p['bugs']
+        p['bugs'] += [bug]
+        puts "\e[32m\e[1mdone!\e[0m"
+        return true
+    end
+    def file_todo(pname, todo)
+        puts "\e[1mfile-todo:\e[0m #{pname}"
+        p = Projects.find(pname)
+        return(warn("\e[31m\e[1mproject not found.\e[0m")) unless p
+        p['todos'] = [] unless p['todos']
+        p['todos'] += [todo]
+        puts "\e[32m\e[1mdone!\e[0m"
+        return true
     end
 end
 if __FILE__ == $0
