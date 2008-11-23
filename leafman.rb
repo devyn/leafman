@@ -35,7 +35,7 @@ module Leafman; extend self
         File.open(File.join(File.expand_path(PROJECT_DIR), ".leafman"), "w") {|f| f.write YAML.dump(@ldb)}
     end
     def parse_args(*argv)
-        load_ldb rescue warn("\e[33mCould not load the Leafman database. Ignore this if you are running an INIT.\e[0m")
+        load_ldb rescue warn("\e[33mcould not load the Leafman database. ignore this if you are running an 'init'.\e[0m")
         case argv.shift
             when /^init$/i
                 init *argv
@@ -85,9 +85,9 @@ module Leafman; extend self
                 @ldb['config']['colors'] = (argv.first =~ /^on$/i)
             when /^help$/i, nil
                 puts "\e[1m\e[36mL \e[32mE \e[33mA \e[36mF \e[32mM \e[33mA \e[36mN\e[0m, The GREEN MEAN Managing MACHINE!"
-                puts "\e[1m\e[34mUsage:\e[0m #{$0} <command> [parameters...]"
+                puts "\e[1m\e[34musage:\e[0m #{$0} <command> [parameters...]"
                 puts
-                puts "\e[1m\e[34mCommand List:\e[0m"
+                puts "\e[1m\e[34mcommand list:\e[0m"
                 puts "\e[1minit\e[0m \e[33m# initialize the project directories for first time\e[0m"
                 puts "\e[1mcreate\e[0m <project-name> \e[33m# create a new project called <project-name>\e[0m"
                 puts "\e[1mdestroy\e[0m <project-name> \e[33m# destroy the project called <project-name>\e[0m"
@@ -111,19 +111,19 @@ module Leafman; extend self
                 puts "\e[1mimport-bzr\e[0m <directory> \e[33m# import a Bazaar project from elsewhere on the filesystem\e[0m"
                 puts "\e[1mimport-hg\e[0m <directory> \e[33m# import a Mercurial project from elsewhere on the filesystem\e[0m"
                 puts
-                puts "\e[1m\e[34mConfig Commands:\e[0m"
+                puts "\e[1m\e[34mconfig commands:\e[0m"
                 puts "\e[1mcolors\e[0m on|off \e[33m# turn ANSI escape sequences on or off\e[0m"
                 puts
-                puts "\e[1m\e[34mCreated by ~devyn\e[0m"
+                puts "\e[1m\e[34mcreated by ~devyn\e[0m"
             else
-                warn "\e[31m\e[1mInvalid command.\e[0m"
+                warn "\e[31m\e[1minvalid command.\e[0m"
         end
         save_ldb
     end
     def init
         epath = File.expand_path PROJECT_DIR
         puts "\e[1minit:\e[0m #{epath}"
-        abort("#{File.join(epath, '.leafman')}: \e[31m\e[1mFile already exists. Refusing to init.\e[0m") if File.exists?(File.join(epath, '.leafman'))
+        abort("#{File.join(epath, '.leafman')}: \e[31m\e[1mfile already exists. refusing to init.\e[0m") if File.exists?(File.join(epath, '.leafman'))
         FileUtils.mkdir_p epath, :verbose => true
         puts "\e[1mdatabase skeleton\e[0m"
         @ldb = {'config' => {}, 'projects' => []}
@@ -140,14 +140,16 @@ module Leafman; extend self
     end
     def destroy(pname)
         puts "\e[1mdestroy:\e[0m #{pname}"
+        p = @ldb['projects'].select{|p|p['name'] == pname}.first
+        return(warn("\e[31m\e[1mproject not found.\e[0m")) unless p
         FileUtils.rm_rf File.join(File.expand_path(PROJECT_DIR), pname), :verbose => true
         puts "\e[1mremove\e[0m #{pname} \e[1mfrom database\e[0m"
-        @ldb['projects'].delete @ldb['projects'].select{|p|p['name']==pname}.first
+        @ldb['projects'].delete p
         puts "\e[32m\e[1mdone!\e[0m"
         return true
     end
     def list
-        puts "\e[1mProject Listing\e[0m"
+        puts "\e[1mproject listing\e[0m"
         @ldb['projects'].each do |p|
             puts "\e[1m*\e[0m\t#{p['name']}"
         end
@@ -167,7 +169,7 @@ module Leafman; extend self
     end
     def git_fork(pname, git_url)
         puts "\e[1mfork:\e[0m #{pname} \e[1mfrom:\e[0m #{git_url}"
-        puts "\e[1mClone\e[0m #{git_url} \e[1minto\e[0m #{File.join(File.expand_path(PROJECT_DIR), pname)}"
+        puts "\e[1mclone\e[0m #{git_url} \e[1minto\e[0m #{File.join(File.expand_path(PROJECT_DIR), pname)}"
         return warn("\e[31m\e[1mgit clone failed.\e[0m") unless system("git", "clone", "-o", "forked_from", git_url, File.join(File.expand_path(PROJECT_DIR), pname))
         puts "\e[1madd\e[0m #{pname} \e[1mto database as GIT repository, fetching from remote '\e[0mforked_from\e[1m'\e[0m"
         @ldb['projects'] << {'name' => pname, 'type' => nil, 'scm' => 'git', 'fetch' => 'forked_from'}
@@ -175,28 +177,28 @@ module Leafman; extend self
         return true
     end
     def sync_all
-        puts "\e[1mSyncing all Git repositories...\e[0m"
+        puts "\e[1msyncing all Git repositories...\e[0m"
         @ldb['projects'].select{|p|p['scm']=='git' and p['fetch']}.each do |p|
             puts "\e[1msync:\e[0m #{p['name']}"
             Dir.chdir(File.join(File.expand_path(PROJECT_DIR), p['name'])) do
                 system("git", "pull", p['fetch']) or warn("\e[31m\e[1mcould not pull for\e[0m #{p['name']}")
             end
         end
-        puts "\e[1mSyncing all Subversion repositories...\e[0m"
+        puts "\e[1msyncing all Subversion repositories...\e[0m"
         @ldb['projects'].select{|p|p['scm']=='svn'}.each do |p|
             puts "\e[1msync:\e[0m #{p['name']}"
             Dir.chdir(File.join(File.expand_path(PROJECT_DIR), p['name'])) do
                 system("svn", "up") or warn("\e[31m\e[1mcould not update\e[0m #{p['name']}")
             end
         end
-        puts "\e[1mSyncing all Bazaar repositories...\e[0m"
+        puts "\e[1msyncing all Bazaar repositories...\e[0m"
         @ldb['projects'].select{|p|p['scm']=='bzr' and p['do_update']}.each do |p|
             puts "\e[1msync:\e[0m #{p['name']}"
             Dir.chdir(File.join(File.expand_path(PROJECT_DIR), p['name'])) do
                 system("bzr", "up") or warn("\e[31m\e[1mcould not update\e[0m #{p['name']}")
             end
         end
-        puts "\e[1mSyncing all Mercurial repositories...\e[0m"
+        puts "\e[1msyncing all Mercurial repositories...\e[0m"
         @ldb['projects'].select{|p|p['scm']=='hg' and p['do_pull']}.each do |p|
             puts "\e[1msync:\e[0m #{p['name']}"
             Dir.chdir(File.join(File.expand_path(PROJECT_DIR), p['name'])) do
@@ -208,7 +210,7 @@ module Leafman; extend self
     end
     def svn_get(pname, svn_url)
         puts "\e[1msvn-get:\e[0m #{pname} \e[1mfrom:\e[0m #{svn_url}"
-        puts "\e[1mCheckout\e[0m #{svn_url} \e[1minto\e[0m #{File.join(File.expand_path(PROJECT_DIR), pname)}"
+        puts "\e[1mcheckout\e[0m #{svn_url} \e[1minto\e[0m #{File.join(File.expand_path(PROJECT_DIR), pname)}"
         return warn("\e[31m\e[1msvn checkout failed.\e[0m") unless system("svn", "checkout", svn_url, File.join(File.expand_path(PROJECT_DIR), pname))
         puts "\e[1madd\e[0m #{pname} \e[1mto database as SVN repository\e[0m"
         @ldb['projects'] << {'name' => pname, 'type' => nil, 'scm' => 'svn'}
@@ -217,7 +219,7 @@ module Leafman; extend self
     end
     def git_get(pname, git_url)
         puts "\e[1mgit-get:\e[0m #{pname} \e[1mfrom:\e[0m #{git_url}"
-        puts "\e[1mClone\e[0m #{git_url} \e[1minto\e[0m #{File.join(File.expand_path(PROJECT_DIR), pname)}"
+        puts "\e[1mclone\e[0m #{git_url} \e[1minto\e[0m #{File.join(File.expand_path(PROJECT_DIR), pname)}"
         return warn("\e[31m\e[1mgit clone failed.\e[0m") unless system("git", "clone", git_url, File.join(File.expand_path(PROJECT_DIR), pname))
         puts "\e[1madd\e[0m #{pname} \e[1mto database as GIT repository\e[0m"
         @ldb['projects'] << {'name' => pname, 'type' => nil, 'scm' => 'git', 'fetch' => 'origin'}
@@ -226,7 +228,7 @@ module Leafman; extend self
     end
     def bzr_get(pname, bzr_url)
         puts "\e[1mbzr-get:\e[0m #{pname} \e[1mfrom:\e[0m #{bzr_url}"
-        puts "\e[1mCheckout\e[0m #{bzr_url} \e[1minto\e[0m #{File.join(File.expand_path(PROJECT_DIR), pname)}"
+        puts "\e[1mcheckout\e[0m #{bzr_url} \e[1minto\e[0m #{File.join(File.expand_path(PROJECT_DIR), pname)}"
         return warn("\e[31mbzr checkout failed.\e[0m") unless system("bzr", "checkout", bzr_url, File.join(File.expand_path(PROJECT_DIR), pname))
         puts "\e[1madd\e[0m #{pname} \e[1mto database as BZR repository\e[0m"
         @ldb['projects'] << {'name' => pname, 'type' => nil, 'scm' => 'bzr', 'do_update' => true}
@@ -235,7 +237,7 @@ module Leafman; extend self
     end
     def hg_get(pname, hg_url)
         puts "\e[1mhg-get:\e[0m #{pname} \e[1mfrom:\e[0m #{hg_url}"
-        puts "\e[1mClone\e[0m #{hg_url} \e[1minto\e[0m #{File.join(File.expand_path(PROJECT_DIR), pname)}"
+        puts "\e[1mclone\e[0m #{hg_url} \e[1minto\e[0m #{File.join(File.expand_path(PROJECT_DIR), pname)}"
         return warn("\e[31m\e[1mhg clone failed.\e[0m") unless system("hg", "clone", hg_url, File.join(File.expand_path(PROJECT_DIR), pname))
         puts "\e[1madd\e[0m #{pname} \e[1mto database as HG repository\e[0m"
         @ldb['projects'] << {'name' => pname, 'type' => nil, 'scm' => 'hg', 'do_pull' => true}
@@ -244,62 +246,74 @@ module Leafman; extend self
     end
     def git_init(pname)
         puts "\e[1mgit-init:\e[0m #{pname}"
+        p = @ldb['projects'].select{|p|p['name'] == pname}.first
+        return(warn("\e[31m\e[1mproject not found.\e[0m")) unless p
         puts "\e[1mchdir\e[0m #{File.join(File.expand_path(PROJECT_DIR), pname)}"
         Dir.chdir(File.join(File.expand_path(PROJECT_DIR), pname)) do
             puts "\e[1mgit init\e[0m"
-            system('git', 'init') or return(warn("\e[31mFailed to initialize.\e[0m"))
+            system('git', 'init') or return(warn("\e[31mfailed to initialize.\e[0m"))
         end
         puts "\e[1mset\e[0m \"#{pname}\".scm \e[1mto GIT\e[0m"
-        @ldb['projects'].select{|p|p['name']==pname}.first['scm'] = 'git'
+        p['scm'] = 'git'
         puts "\e[32m\e[1mdone!\e[0m"
         return true
     end
     def bzr_init(pname)
         puts "\e[1mbzr-init:\e[0m #{pname}"
+        p = @ldb['projects'].select{|p|p['name'] == pname}.first
+        return(warn("\e[31m\e[1mproject not found.\e[0m")) unless p
         puts "\e[1mchdir\e[0m #{File.join(File.expand_path(PROJECT_DIR), pname)}"
         Dir.chdir(File.join(File.expand_path(PROJECT_DIR), pname)) do
             puts "\e[1mbzr init\e[0m"
-            system('bzr', 'init') or return(warn("\e[31mFailed to initialize.\e[0m"))
+            system('bzr', 'init') or return(warn("\e[31mfailed to initialize.\e[0m"))
         end
         puts "\e[1mset\e[0m \"#{pname}\".scm \e[1mto BZR\e[0m"
-        @ldb['projects'].select{|p|p['name']==pname}.first['scm'] = 'bzr'
+        p['scm'] = 'bzr'
         puts "\e[32m\e[1mdone!\e[0m"
         return true
     end
     def hg_init(pname)
         puts "\e[1mhg-init:\e[0m #{pname}"
+        p = @ldb['projects'].select{|p|p['name'] == pname}.first
+        return(warn("\e[31m\e[1mproject not found.\e[0m")) unless p
         puts "\e[1mchdir\e[0m #{File.join(File.expand_path(PROJECT_DIR), pname)}"
         Dir.chdir(File.join(File.expand_path(PROJECT_DIR), pname)) do
             puts "\e[1mhg init\e[0m"
-            system('hg', 'init') or return(warn("\e[31mFailed to initialize.\e[0m"))
+            system('hg', 'init') or return(warn("\e[31mfailed to initialize.\e[0m"))
         end
         puts "\e[1mset\e[0m \"#{pname}\".scm \e[1mto HG\e[0m"
-        @ldb['projects'].select{|p|p['name']==pname}.first['scm'] = 'hg'
+        p['scm'] = 'hg'
         puts "\e[32m\e[1mdone!\e[0m"
         return true
     end
     def skel_ruby(pname, *classes)
         puts "\e[1mskel-ruby:\e[0m #{pname}"
+        p = @ldb['projects'].select{|p|p['name'] == pname}.first
+        return(warn("\e[31m\e[1mproject not found.\e[0m")) unless p
         puts "\e[1mappend a skeleton for\e[0m #{pname.rubyize} \e[1mto\e[0m #{File.join(File.expand_path(PROJECT_DIR), pname, "main.rb")}"
         File.open(File.join(File.expand_path(PROJECT_DIR), pname, "main.rb"), 'a') do |f|
             f.write "\nmodule #{pname.rubyize}\n#{classes.collect{|c|"\tclass #{c.rubyize}\n\t\t\n\tend\n"}.join}end\n"
         end
         puts "\e[1mchange type to\e[0m ruby"
-        @ldb['projects'].select{|p|p['name']==pname}.first['type'] = 'ruby'
+        p['type'] = 'ruby'
         puts "\e[32m\e[1mdone!\e[0m"
     end
     def skel_shoes(pname)
         puts "\e[1mskel-shoes:\e[0m #{pname}"
+        p = @ldb['projects'].select{|p|p['name'] == pname}.first
+        return(warn("\e[31m\e[1mproject not found.\e[0m")) unless p
         puts "\e[1mappend a skeleton for\e[0m #{pname.rubyize} < Shoes \e[1mto\e[0m #{File.join(File.expand_path(PROJECT_DIR), pname, "main.shoes.rb")}"
         File.open(File.join(File.expand_path(PROJECT_DIR), pname, "main.shoes.rb"), 'a') do |f|
             f.write "\nclass #{pname.rubyize} < Shoes\n\turl '/', :index\n\tdef index\n\t\tpara 'leafman rules'\n\tend\nend\n"
         end
         puts "\e[1mchange type to\e[0m shoes"
-        @ldb['projects'].select{|p|p['name']==pname}.first['type'] = 'shoes'
+        p['type'] = 'shoes'
         puts "\e[32m\e[1mdone!\e[0m"
     end
     def skel_rails(pname, *rails_opts)
         puts "\e[1mskel-rails:\e[0m #{pname}"
+        p = @ldb['projects'].select{|p|p['name'] == pname}.first
+        return(warn("\e[31m\e[1mproject not found.\e[0m")) unless p
         puts "\e[1mrun \e[0m'rails'\e[1m on project dir\e[0m"
         Dir.chdir(File.join(File.expand_path(PROJECT_DIR), pname)) do
             run = ["rails"]
@@ -308,7 +322,7 @@ module Leafman; extend self
             system *run
         end
         puts "\e[1mchange type to\e[0m rails"
-        @ldb['projects'].select{|p|p['name']==pname}.first['type'] = 'rails'
+        p['type'] = 'rails'
         puts "\e[32m\e[1mdone!\e[0m"
     end
     def proj_import(dir)
