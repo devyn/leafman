@@ -148,6 +148,25 @@ module Leafman; extend self
                 puts "\e[1mcolors\e[0m on|off \e[33m# turn ANSI escape sequences on or off\e[0m"
                 puts
                 puts "\e[1m\e[34mcreated by ~devyn\e[0m"
+                puts "this Leafman doesn't know \e[1m*who*\e[0m he is (hmm... possible easter egg hint?)"
+            when /^who\??$/i
+                puts <<EOF
+      \e[32m\e[1mleafman who?\e[0m
+        \e[34m/-----\\
+        | \e[0m???\e[34m |
+        \\-----/\e[0m
+          | |
+       \e[36m___\e[0m| |\e[36m___\e[0m
+       \e[33m/ /   \\ \\\e[0m
+      \e[33m/ /\e[0m|   |\e[33m\\ \\\e[0m
+     \e[33m/ /\e[0m |   | \e[33m\\ \\\e[0m
+     \e[32mo\e[0m   |   |   \e[32mo\e[0m
+         \e[31m| | |
+         | | |
+        /  |  \\
+        |  |  |\e[0m
+         \e[32moo oo\e[0m
+EOF
             else
                 warn "\e[31m\e[1minvalid command.\e[0m"
         end
