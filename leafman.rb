@@ -127,6 +127,10 @@ module Leafman; extend self
                 file_bug *argv
             when /^file-todo$/i
                 file_todo *argv
+            when /^complete-bug$/i
+                complete_bug *argv
+            when /^complete-todo$/i
+                complete_todo *argv
             when /^colors$/i
                 @config['colors'] = ((argv.first =~ /^on$/i) ? true : false)
             when /^help$/i, nil
@@ -156,8 +160,10 @@ module Leafman; extend self
                 puts "\e[1mimport-svn\e[0m <directory> \e[33m# import a Subversion project from elsewhere on the filesystem\e[0m"
                 puts "\e[1mimport-bzr\e[0m <directory> \e[33m# import a Bazaar project from elsewhere on the filesystem\e[0m"
                 puts "\e[1mimport-hg\e[0m <directory> \e[33m# import a Mercurial project from elsewhere on the filesystem\e[0m"
-                puts "\e[1mfile-bug\e[0m <project-name> \e[33m# add a BUG to <project-name>\e[0m"
-                puts "\e[1mfile-todo\e[0m <project-name> \e[33m# add a TODO to <project-name>\e[0m"
+                puts "\e[1mfile-bug\e[0m <project-name> <BUG> \e[33m# add BUG to <project-name>\e[0m"
+                puts "\e[1mfile-todo\e[0m <project-name> <TODO> \e[33m# add TODO to <project-name>\e[0m"
+                puts "\e[1mcomplete-bug\e[0m <project-name> <BUG> \e[33m# remove BUG from <project-name>\e[0m"
+                puts "\e[1mcomplete-todo\e[0m <project-name> <TODO> \e[33m# remove TODO from <project-name>\e[0m"
                 puts
                 puts "\e[1m\e[34mconfig commands:\e[0m"
                 puts "\e[1mcolors\e[0m on|off \e[33m# turn ANSI escape sequences on or off\e[0m"
@@ -451,6 +457,24 @@ EOF
         return(warn("\e[31m\e[1mproject not found.\e[0m")) unless p
         p['todos'] = [] unless p['todos']
         p['todos'] += [todo]
+        puts "\e[32m\e[1mdone!\e[0m"
+        return true
+    end
+    def complete_bug(pname, bug)
+        puts "\e[1mcomplete-bug:\e[0m #{pname}"
+        p = Projects.find(pname)
+        return(warn("\e[31m\e[1mproject not found.\e[0m")) unless p
+        p['bugs'] = [] unless p['bugs']
+        p['bugs'] -= [bug]
+        puts "\e[32m\e[1mdone!\e[0m"
+        return true
+    end
+    def complete_todo(pname, todo)
+        puts "\e[1mcomplete-todo:\e[0m #{pname}"
+        p = Projects.find(pname)
+        return(warn("\e[31m\e[1mproject not found.\e[0m")) unless p
+        p['todos'] = [] unless p['todos']
+        p['todos'] -= [todo]
         puts "\e[32m\e[1mdone!\e[0m"
         return true
     end
