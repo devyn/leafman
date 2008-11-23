@@ -151,9 +151,15 @@ module Leafman; extend self
         return true
     end
     def show(pname)
-        @ldb['projects'].select{|p|p['name'] == pname}.first.each do |k,v|
-            puts "\e[1m#{k}\e[0m\t\t= #{v.inspect}"
-        end
+        p = @ldb['projects'].select{|p|p['name'] == pname}.first
+        return(warn("\e[31m\e[1mproject not found.\e[0m")) unless p
+        puts "\e[1m#{p['name']}\e[0m"
+        puts "...\tuses \e[32m\e[1mGit\e[0m#{" and fetches from \e[36m#{p['fetch']}\e[0m" if p['fetch']}." if p['scm'] == 'git'
+        puts "...\tuses \e[34m\e[1mSubversion\e[0m." if p['scm'] == 'svn'
+        puts "...\tuses \e[33m\e[1mBazaar\e[0m#{" and runs updates" if p['do_update']}." if p['scm'] == 'bzr'
+        puts "...\tuses \e[36m\e[1mMercurial\e[0m#{" and pulls" if p['do_pull']}." if p['scm'] == 'hg'
+        puts "...\tdoesn't have \e[1mversion control\e[0m." unless p['scm']
+        puts "...\tis a \e[1m#{p['type'].capitalize}\e[0m project." if p['type']
         return true
     end
     def git_fork(pname, git_url)
