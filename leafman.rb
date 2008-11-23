@@ -59,6 +59,13 @@ module Leafman; extend self
             Kernel.puts *(s.collect{|s|s.gsub(/\e\[\d+m/, '')})
         end
     end
+    def print(*s)
+        if (@config['colors'] rescue nil)
+            Kernel.print *s
+        else
+            Kernel.print *(s.collect{|s|s.gsub(/\e\[\d+m/, '')})
+        end
+    end
     def warn(*s)
         if (@config['colors'] rescue nil)
             Kernel.warn *s
@@ -115,14 +122,6 @@ module Leafman; extend self
                 skel_rails *argv
             when /^import$/i
                 proj_import *argv
-            when /^import-git$/i
-                proj_import_git *argv
-            when /^import-svn$/i
-                proj_import_svn *argv
-            when /^import-bzr$/i
-                proj_import_bzr *argv
-            when /^import-hg$/i
-                proj_import_hg *argv
             when /^file-bug$/i
                 file_bug *argv
             when /^file-todo$/i
@@ -155,11 +154,7 @@ module Leafman; extend self
                 puts "\e[1mskel-ruby\e[0m <project-name> [classes...] \e[33m# make a ruby skeleton for <project-name> and change the type to 'ruby'\e[0m"
                 puts "\e[1mskel-shoes\e[0m <project-name> \e[33m# make a shoes skeleton for <project-name> and change the type to 'shoes'\e[0m"
                 puts "\e[1mskel-rails\e[0m <project-name> [rails-command-opts...] \e[33m# make a ruby on rails skeleton for <project-name> and change the type to 'rails'\e[0m"
-                puts "\e[1mimport\e[0m <directory> \e[33m# import a project from elsewhere on the filesystem\e[0m"
-                puts "\e[1mimport-git\e[0m <directory> \e[33m# import a Git project from elsewhere on the filesystem\e[0m"
-                puts "\e[1mimport-svn\e[0m <directory> \e[33m# import a Subversion project from elsewhere on the filesystem\e[0m"
-                puts "\e[1mimport-bzr\e[0m <directory> \e[33m# import a Bazaar project from elsewhere on the filesystem\e[0m"
-                puts "\e[1mimport-hg\e[0m <directory> \e[33m# import a Mercurial project from elsewhere on the filesystem\e[0m"
+                puts "\e[1mimport\e[0m <directory> \e[33m# import a project from elsewhere on the filesystem and auto-detect its SCM\e[0m"
                 puts "\e[1mfile-bug\e[0m <project-name> <BUG> \e[33m# add BUG to <project-name>\e[0m"
                 puts "\e[1mfile-todo\e[0m <project-name> <TODO> \e[33m# add TODO to <project-name>\e[0m"
                 puts "\e[1mcomplete-bug\e[0m <project-name> <BUG> \e[33m# remove BUG from <project-name>\e[0m"
@@ -266,12 +261,12 @@ EOF
                     system("svn", "up") or warn("\e[31m\e[1mcould not update\e[0m #{p['name']}")
                 end
             elsif (p['scm'] == 'bzr') and p['do_update']
-                puts "\e[1msync:\e[0m #{p['name']}"
+                puts "\e[1msync-bzr:\e[0m #{p['name']}"
                 Dir.chdir(File.join(File.expand_path(PROJECT_DIR), p['name'])) do
                     system("bzr", "up") or warn("\e[31m\e[1mcould not update\e[0m #{p['name']}")
                 end
             elsif (p['scm'] == 'hg') and p['do_pull']
-                puts "\e[1msync:\e[0m #{p['name']}"
+                puts "\e[1msync-hg:\e[0m #{p['name']}"
                 Dir.chdir(File.join(File.expand_path(PROJECT_DIR), p['name'])) do
                     system("hg", "pull") or warn("\e[31m\e[1mcould not pull for\e[0m #{p['name']}")
                 end
@@ -405,40 +400,15 @@ EOF
     def proj_import(dir)
         puts "\e[1mimport:\e[0m #{File.basename(dir)}"
         FileUtils.cp_r File.expand_path(dir), File.join(File.expand_path(PROJECT_DIR), File.basename(dir)), :verbose => true
+        print "\e[1mauto-detect SCM:\e[0m "
+        scm = nil
+        scm = 'git' if File.directory?(File.join(File.expand_path(PROJECT_DIR), File.basename(dir), ".git"))
+        scm = 'svn' if File.directory?(File.join(File.expand_path(PROJECT_DIR), File.basename(dir), ".svn"))
+        scm = 'bzr' if File.directory?(File.join(File.expand_path(PROJECT_DIR), File.basename(dir), ".bzr"))
+        scm = 'hg' if File.directory?(File.join(File.expand_path(PROJECT_DIR), File.basename(dir), ".hg"))
+        puts((scm or 'none').upcase)
         puts "\e[1mcreate project config\e[0m"
-        Projects.add(File.basename(dir), 'type' => nil, 'scm' => nil)
-        puts "\e[32m\e[1mdone!\e[0m"
-        return true
-    end
-    def proj_import_git(dir)
-        puts "\e[1mimport-git:\e[0m #{File.basename(dir)}"
-        FileUtils.cp_r File.expand_path(dir), File.join(File.expand_path(PROJECT_DIR), File.basename(dir)), :verbose => true
-        puts "\e[1mcreate project config\e[0m"
-        Projects.add(File.basename(dir), 'type' => nil, 'scm' => 'git')
-        puts "\e[32m\e[1mdone!\e[0m"
-        return true
-    end
-    def proj_import_svn(dir)
-        puts "\e[1mimport-svn:\e[0m #{File.basename(dir)}"
-        FileUtils.cp_r File.expand_path(dir), File.join(File.expand_path(PROJECT_DIR), File.basename(dir)), :verbose => true
-        puts "\e[1mcreate project config\e[0m"
-        Projects.add(File.basename(dir), 'type' => nil, 'scm' => 'svn')
-        puts "\e[32m\e[1mdone!\e[0m"
-        return true
-    end
-    def proj_import_bzr(dir)
-        puts "\e[1mimport-bzr:\e[0m #{File.basename(dir)}"
-        FileUtils.cp_r File.expand_path(dir), File.join(File.expand_path(PROJECT_DIR), File.basename(dir)), :verbose => true
-        puts "\e[1mcreate project config\e[0m"
-        Projects.add(File.basename(dir), 'type' => nil, 'scm' => 'bzr')
-        puts "\e[32m\e[1mdone!\e[0m"
-        return true
-    end
-    def proj_import_hg(dir)
-        puts "\e[1mimport-hg:\e[0m #{File.basename(dir)}"
-        FileUtils.cp_r File.expand_path(dir), File.join(File.expand_path(PROJECT_DIR), File.basename(dir)), :verbose => true
-        puts "\e[1mcreate project config\e[0m"
-        Projects.add(File.basename(dir), 'type' => nil, 'scm' => 'hg')
+        Projects.add(File.basename(dir), 'type' => nil, 'scm' => scm)
         puts "\e[32m\e[1mdone!\e[0m"
         return true
     end
