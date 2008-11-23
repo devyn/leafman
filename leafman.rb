@@ -20,10 +20,19 @@ module Leafman; extend self
         end
         def []=(k,v)
             y = YAML.load(File.read(File.join(File.expand_path(PROJECT_DIR), @pname, '.leafman-project')))
-            y[k]=v
+            r = y[k]=v
             File.open(File.join(File.expand_path(PROJECT_DIR), @pname, '.leafman-project'), 'w') do |f|
                 f.write YAML.dump(y)
             end
+            r
+        end
+        def delete k
+            y = YAML.load(File.read(File.join(File.expand_path(PROJECT_DIR), @pname, '.leafman-project')))
+            r = y.delete(k)
+            File.open(File.join(File.expand_path(PROJECT_DIR), @pname, '.leafman-project'), 'w') do |f|
+                f.write YAML.dump(y)
+            end
+            r
         end
     end
     module Projects; extend self
