@@ -9,7 +9,7 @@ class String
     end
 end
 module Leafman; extend self
-    PROJECT_DIR = "~/Projects"
+    PROJECT_DIR = ENV['LEAFMAN_PATH'] || "~/Projects"
     def puts(*s)
         if (@ldb['config']['colors'] rescue nil)
             Kernel.puts *s
@@ -23,6 +23,10 @@ module Leafman; extend self
         else
             Kernel.warn *(s.collect{|s|s.gsub(/\e\[\d+m/, '')})
         end
+    end
+    def abort(*s)
+        warn *s
+        exit 1
     end
     def load_ldb
         @ldb = YAML.load(File.read(File.join(File.expand_path(PROJECT_DIR), ".leafman")))
@@ -116,6 +120,7 @@ module Leafman; extend self
     def init
         epath = File.expand_path PROJECT_DIR
         puts "\e[1minit:\e[0m #{epath}"
+        abort("#{File.join(epath, '.leafman')}: \e[31m\e[1mFile already exists. Refusing to init.\e[0m") if File.exists?(File.join(epath, '.leafman'))
         FileUtils.mkdir_p epath, :verbose => true
         puts "\e[1mdatabase skeleton\e[0m"
         @ldb = {'config' => {}, 'projects' => []}
