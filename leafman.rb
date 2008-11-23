@@ -63,7 +63,7 @@ module Leafman; extend self
                 git_init *argv
             when /^bzr-init$/i
                 bzr_init *argv
-            when /^git-init$/i
+            when /^hg-init$/i
                 hg_init *argv
             when /^skel-ruby$/i
                 skel_ruby *argv
