@@ -49,8 +49,18 @@ module Leafman; extend self
                 sync_all *argv
             when /^svn-get$/i
                 svn_get *argv
+            when /^git-get$/i
+                git_get *argv
+            when /^bzr-get$/i
+                bzr_get *argv
+            when /^hg-get$/i
+                hg_get *argv
             when /^git-init$/i
                 git_init *argv
+            when /^bzr-init$/i
+                bzr_init *argv
+            when /^git-init$/i
+                hg_init *argv
             when /^skel-ruby$/i
                 skel_ruby *argv
             when /^skel-shoes$/i
@@ -67,10 +77,15 @@ module Leafman; extend self
                 puts "\e[1mdestroy\e[0m <project-name> \e[33m# destroy the project called <project-name>\e[0m"
                 puts "\e[1mlist\e[0m \e[33m# list of all projects\e[0m"
                 puts "\e[1mshow\e[0m <project-name> \e[33m# show everything known about the project called <project-name>\e[0m"
-                puts "\e[1mfork\e[0m <project-name> <git-url> \e[33m# fork the GIT project called <project-name> at <git-url>\e[0m"
+                puts "\e[1mfork\e[0m <project-name> <git-url> \e[33m# fork the Git project called <project-name> at <git-url>\e[0m"
                 puts "\e[1msync\e[0m \e[33m# synchronize all GIT and SVN projects with the server\e[0m"
-                puts "\e[1msvn-get\e[0m <project-name> <svn-url> \e[33m# checkout the SVN project called <project-name at <svn-url>\e[0m"
-                puts "\e[1mgit-init\e[0m <project-name> \e[33m# setup the project called <project-name> for GIT\e[0m"
+                puts "\e[1msvn-get\e[0m <project-name> <svn-url> \e[33m# checkout the Subversion project called <project-name> at <svn-url>\e[0m"
+                puts "\e[1mgit-get\e[0m <project-name> <git-url> \e[33m# clone the Git project called <project-name> at <git-url>\e[0m"
+                puts "\e[1mbzr-get\e[0m <project-name> <bzr-url> \e[33m# checkout the Bazaar project called <project-name> at <bzr-url>\e[0m"
+                puts "\e[1mhg-get\e[0m <project-name> <hg-url> \e[33m# clone the Mercurial project called <project-name> at <hg-url>\e[0m"
+                puts "\e[1mgit-init\e[0m <project-name> \e[33m# setup the project called <project-name> for Git\e[0m"
+                puts "\e[1mbzr-init\e[0m <project-name> \e[33m# setup the project called <project-name> for Bazaar\e[0m"
+                puts "\e[1mhg-init\e[0m <project-name> \e[33m# setup the project called <project-name> for Mercurial\e[0m"
                 puts "\e[1mskel-ruby\e[0m <project-name> [classes...] \e[33m# make a ruby skeleton for <project-name> and change the type to 'ruby'\e[0m"
                 puts "\e[1mskel-shoes\e[0m <project-name> \e[33m# make a shoes skeleton for <project-name> and change the type to 'shoes'\e[0m"
                 puts
@@ -131,18 +146,32 @@ module Leafman; extend self
         return true
     end
     def sync_all
-        puts "\e[1mSyncing all GIT repositories...\e[0m"
+        puts "\e[1mSyncing all Git repositories...\e[0m"
         @ldb['projects'].select{|p|p['scm']=='git' and p['fetch']}.each do |p|
             puts "\e[1msync:\e[0m #{p['name']}"
             Dir.chdir(File.join(File.expand_path(PROJECT_DIR), p['name'])) do
                 system("git", "pull", p['fetch']) or warn("\e[31m\e[1mcould not pull for\e[0m #{p['name']}")
             end
         end
-        puts "\e[1mSyncing all SVN repositories...\e[0m"
+        puts "\e[1mSyncing all Subversion repositories...\e[0m"
         @ldb['projects'].select{|p|p['scm']=='svn'}.each do |p|
             puts "\e[1msync:\e[0m #{p['name']}"
             Dir.chdir(File.join(File.expand_path(PROJECT_DIR), p['name'])) do
                 system("svn", "up") or warn("\e[31m\e[1mcould not update\e[0m #{p['name']}")
+            end
+        end
+        puts "\e[1mSyncing all Bazaar repositories...\e[0m"
+        @ldb['projects'].select{|p|p['scm']=='bzr'}.each do |p|
+            puts "\e[1msync:\e[0m #{p['name']}"
+            Dir.chdir(File.join(File.expand_path(PROJECT_DIR), p['name'])) do
+                system("bzr", "up") or warn("\e[31m\e[1mcould not update\e[0m #{p['name']}")
+            end
+        end
+        puts "\e[1mSyncing all Mercurial repositories...\e[0m"
+        @ldb['projects'].select{|p|p['scm']=='hg' and p['fetch']}.each do |p|
+            puts "\e[1msync:\e[0m #{p['name']}"
+            Dir.chdir(File.join(File.expand_path(PROJECT_DIR), p['name'])) do
+                system("hg", "pull") or warn("\e[31m\e[1mcould not pull for\e[0m #{p['name']}")
             end
         end
         puts "\e[32m\e[1mdone!\e[0m"
@@ -157,6 +186,33 @@ module Leafman; extend self
         puts "\e[32m\e[1mdone!\e[0m"
         return true
     end
+    def git_get(pname, git_url)
+        puts "\e[1mgit-get:\e[0m #{pname} \e[1mfrom:\e[0m #{git_url}"
+        puts "\e[1mClone\e[0m #{git_url} \e[1minto\e[0m #{File.join(File.expand_path(PROJECT_DIR), pname)}"
+        return warn("\e[31m\e[1mgit clone failed.\e[0m") unless system("git", "clone", git_url, File.join(File.expand_path(PROJECT_DIR), pname))
+        puts "\e[1madd\e[0m #{pname} \e[1mto database as GIT repository\e[0m"
+        @ldb['projects'] << {'name' => pname, 'type' => nil, 'scm' => 'git', 'fetch' => 'origin'}
+        puts "\e[32m\e[1mdone!\e[0m"
+        return true
+    end
+    def bzr_get(pname, bzr_url)
+        puts "\e[1mbzr-get:\e[0m #{pname} \e[1mfrom:\e[0m #{bzr_url}"
+        puts "\e[1mCheckout\e[0m #{bzr_url} \e[1minto\e[0m #{File.join(File.expand_path(PROJECT_DIR), pname)}"
+        return warn("\e[31mbzr checkout failed.\e[0m") unless system("bzr", "checkout", bzr_url, File.join(File.expand_path(PROJECT_DIR), pname))
+        puts "\e[1madd\e[0m #{pname} \e[1mto database as BZR repository\e[0m"
+        @ldb['projects'] << {'name' => pname, 'type' => nil, 'scm' => 'bzr'}
+        puts "\e[32m\e[1mdone!\e[0m"
+        return true
+    end
+    def hg_get(pname, hg_url)
+        puts "\e[1mhg-get:\e[0m #{pname} \e[1mfrom:\e[0m #{git_url}"
+        puts "\e[1mClone\e[0m #{hg_url} \e[1minto\e[0m #{File.join(File.expand_path(PROJECT_DIR), pname)}"
+        return warn("\e[31m\e[1mhg clone failed.\e[0m") unless system("hg", "clone", git_url, File.join(File.expand_path(PROJECT_DIR), pname))
+        puts "\e[1madd\e[0m #{pname} \e[1mto database as HG repository\e[0m"
+        @ldb['projects'] << {'name' => pname, 'type' => nil, 'scm' => 'hg'}
+        puts "\e[32m\e[1mdone!\e[0m"
+        return true
+    end
     def git_init(pname)
         puts "\e[1mgit-init:\e[0m #{pname}"
         puts "\e[1mchdir\e[0m #{File.join(File.expand_path(PROJECT_DIR), pname)}"
@@ -166,6 +222,30 @@ module Leafman; extend self
         end
         puts "\e[1mset\e[0m \"#{pname}\".scm \e[1mto GIT\e[0m"
         @ldb['projects'].select{|p|p['name']==pname}.first['scm'] = 'git'
+        puts "\e[32m\e[1mdone!\e[0m"
+        return true
+    end
+    def bzr_init(pname)
+        puts "\e[1mbzr-init:\e[0m #{pname}"
+        puts "\e[1mchdir\e[0m #{File.join(File.expand_path(PROJECT_DIR), pname)}"
+        Dir.chdir(File.join(File.expand_path(PROJECT_DIR), pname)) do
+            puts "\e[1mbzr init\e[0m"
+            system('bzr', 'init') or return(warn("\e[31mFailed to initialize.\e[0m"))
+        end
+        puts "\e[1mset\e[0m \"#{pname}\".scm \e[1mto BZR\e[0m"
+        @ldb['projects'].select{|p|p['name']==pname}.first['scm'] = 'bzr'
+        puts "\e[32m\e[1mdone!\e[0m"
+        return true
+    end
+    def hg_init(pname)
+        puts "\e[1mhg-init:\e[0m #{pname}"
+        puts "\e[1mchdir\e[0m #{File.join(File.expand_path(PROJECT_DIR), pname)}"
+        Dir.chdir(File.join(File.expand_path(PROJECT_DIR), pname)) do
+            puts "\e[1mhg init\e[0m"
+            system('hg', 'init') or return(warn("\e[31mFailed to initialize.\e[0m"))
+        end
+        puts "\e[1mset\e[0m \"#{pname}\".scm \e[1mto HG\e[0m"
+        @ldb['projects'].select{|p|p['name']==pname}.first['scm'] = 'hg'
         puts "\e[32m\e[1mdone!\e[0m"
         return true
     end
