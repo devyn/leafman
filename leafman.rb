@@ -132,6 +132,8 @@ module Leafman; extend self
                 complete_bug *argv
             when /^complete-todo$/i
                 complete_todo *argv
+            when /^what-to-do\??$/i
+                what_to_do *argv
             when /^colors$/i
                 @config['colors'] = ((argv.first =~ /^on$/i) ? true : false)
             when /^help$/i, nil
@@ -161,6 +163,7 @@ module Leafman; extend self
                 puts "\e[1mfile-todo\e[0m <project-name> <TODO> \e[33m# add TODO to <project-name>\e[0m"
                 puts "\e[1mcomplete-bug\e[0m <project-name> <BUG> \e[33m# remove BUG from <project-name>\e[0m"
                 puts "\e[1mcomplete-todo\e[0m <project-name> <TODO> \e[33m# remove TODO from <project-name>\e[0m"
+                puts "\e[1mwhat-to-do?\e[0m \e[33m# a list of every outstanding bug/todo in all projects\e[0m"
                 puts
                 puts "\e[1m\e[34mconfig commands:\e[0m"
                 puts "\e[1mcolors\e[0m on|off \e[33m# turn ANSI escape sequences on or off\e[0m"
@@ -448,6 +451,18 @@ EOF
         p['todos'] = [] unless p['todos']
         p['todos'] -= [todo]
         puts "\e[32m\e[1mdone!\e[0m"
+        return true
+    end
+    def what_to_do
+        puts "\e[1mWhat to do?\e[0m"
+        Projects.each do |p|
+            p['bugs'].each do |b|
+                puts "...\e[1m#{p['name']}\e[0m\t\t\e[31m#{b}\e[0m"
+            end if p['bugs']
+            p['todos'].each do |t|
+                puts "...\e[1m#{p['name']}\e[0m\t\t\e[33m#{t}\e[0m"
+            end if p['todos']
+        end
         return true
     end
 end
