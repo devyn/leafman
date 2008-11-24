@@ -234,10 +234,10 @@ EOF
         puts "...\tdoesn't have \e[1mversion control\e[0m." unless p['scm']
         puts "...\tis a \e[1m#{p['type'].capitalize}\e[0m project." if p['type']
         p['bugs'].each do |b|
-            puts "...\t\e[1mbug:\e[0m #{b}"
+            puts "...\t\e[1m\e[31mbug:\e[0m #{b}"
         end if p['bugs']
         p['todos'].each do |t|
-            puts "...\t\e[1mtodo:\e[0m #{t}"
+            puts "...\t\e[1m\e[33mtodo:\e[0m #{t}"
         end if p['todos']
         return true
     end
