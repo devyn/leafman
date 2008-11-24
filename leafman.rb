@@ -455,12 +455,22 @@ EOF
     end
     def what_to_do
         puts "\e[1mWhat to do?\e[0m"
+        hghst = 0
+        Projects.each{|p| hghst = p['name'].size if (p['name'].size > hghst) and (p['todos'] or p['bugs']) }
         Projects.each do |p|
             p['bugs'].each do |b|
-                puts "...\e[1m#{p['name']}\e[0m\t\t\e[31m#{b}\e[0m"
+                print "...\e[1m#{p['name']}\e[0m"
+                (hghst-p['name'].size+4).times do |tm|
+                    putc 0x20
+                end
+                puts "\e[31m#{b}\e[0m"
             end if p['bugs']
             p['todos'].each do |t|
-                puts "...\e[1m#{p['name']}\e[0m\t\t\e[33m#{t}\e[0m"
+                print "...\e[1m#{p['name']}\e[0m"
+                (hghst-p['name'].size+4).times do |tm|
+                    putc 0x20
+                end
+                puts "\e[33m#{t}\e[0m"
             end if p['todos']
         end
         return true
