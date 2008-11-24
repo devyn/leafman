@@ -246,7 +246,7 @@ EOF
         puts "\e[1mclone\e[0m #{git_url} \e[1minto\e[0m #{File.join(File.expand_path(PROJECT_DIR), pname)}"
         return warn("\e[31m\e[1mgit clone failed.\e[0m") unless system("git", "clone", "-o", "forked_from", git_url, File.join(File.expand_path(PROJECT_DIR), pname))
         puts "\e[1mcreate project config\e[0m"
-        Project.add(pname, 'type' => nil, 'scm' => 'git', 'fetch' => 'forked_from')
+        Projects.add(pname, 'type' => nil, 'scm' => 'git', 'fetch' => 'forked_from')
         puts "\e[32m\e[1mdone!\e[0m"
         return true
     end
