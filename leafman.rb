@@ -46,10 +46,12 @@ module Leafman; extend self
             end
         end
         def each
-            pnames = Dir.glob(File.join(File.expand_path(PROJECT_DIR), "*", ".leafman-project")).collect{|d|File.basename(File.dirname(d))}
-            pnames.each do |pname|
+            names.each do |pname|
                 yield ProjectAccessor.new(pname)
             end
+        end
+        def names
+            Dir.glob(File.join(File.expand_path(PROJECT_DIR), "*", ".leafman-project")).collect{|d|File.basename(File.dirname(d))}
         end
     end
     def puts(*s)
