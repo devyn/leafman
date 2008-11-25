@@ -127,12 +127,10 @@ module Leafman; extend self
                 proj_import *argv
             when /^file-bug$/i
                 file_bug *argv
-            when /^file-todo$/i
-                file_todo *argv
-            when /^complete-bug$/i
-                complete_bug *argv
-            when /^complete-todo$/i
-                complete_todo *argv
+            when /^add-task$/i
+                add_task *argv
+            when /^fix-bug$/i, /^complete-task$/i
+                fix_bug_or_complete_task *argv
             when /^what-to-do\??$/i
                 what_to_do *argv
             when /^colors$/i
@@ -162,15 +160,14 @@ module Leafman; extend self
                 puts "\e[1mskel-shoes\e[0m <project-name> \e[33m# make a shoes skeleton for <project-name> and change the type to 'shoes'\e[0m"
                 puts "\e[1mskel-rails\e[0m <project-name> [rails-command-opts...] \e[33m# make a ruby on rails skeleton for <project-name> and change the type to 'rails'\e[0m"
                 puts "\e[1mimport\e[0m <directory> \e[33m# import a project from elsewhere on the filesystem and auto-detect its SCM\e[0m"
-                puts "\e[1mfile-bug\e[0m <project-name> <BUG> \e[33m# add BUG to <project-name>\e[0m"
-                puts "\e[1mfile-todo\e[0m <project-name> <TODO> \e[33m# add TODO to <project-name>\e[0m"
-                puts "\e[1mcomplete-bug\e[0m <project-name> <BUG> \e[33m# remove BUG from <project-name>\e[0m"
-                puts "\e[1mcomplete-todo\e[0m <project-name> <TODO> \e[33m# remove TODO from <project-name>\e[0m"
                 puts "\e[1mwhat-to-do?\e[0m \e[33m# a list of every outstanding bug/todo in all projects\e[0m"
                 puts
                 puts "\e[1m\e[34mconfig commands:\e[0m"
                 puts "\e[1mcolors\e[0m on|off \e[33m# turn ANSI escape sequences on or off\e[0m"
                 puts "\e[1mset-sync\e[0m on|off|<git-remote> \e[33m# set the ability to sync on or off, or for git repositories set the remote to pull from\e[0m"
+                puts "\e[1mfile-bug\e[0m <project-name> <bug> \e[33m# file a bug on <project-name>\e[0m"
+                puts "\e[1madd-task\e[0m <project-name> <task> \e[33m# add a task to <project-name>\e[0m"
+                puts "\e[1mfix-bug|complete-task\e[0m <project-name> <number> \e[33m# fix bug/complete task on <project-name>. <number> is the (ex. t0, b4) number that is shown on what-to-do? or show\e[0m"
                 puts
                 puts "\e[1m\e[34mcreated by ~devyn\e[0m"
                 puts "this Leafman doesn't know \e[1m*who*\e[0m he is (hmm... possible easter egg hint?)"
@@ -240,11 +237,11 @@ EOF
         puts "...\tuses \e[36m\e[1mMercurial\e[0m#{" and pulls" if p['do_pull']}." if p['scm'] == 'hg'
         puts "...\tdoesn't have \e[1mversion control\e[0m." unless p['scm']
         puts "...\tis a \e[1m#{p['type'].capitalize}\e[0m project." if p['type']
-        p['bugs'].each do |b|
-            puts "...\t\e[1m\e[31mbug:\e[0m #{b}"
+        p['bugs'].each_with_index do |b, i|
+            puts "...\t\e[1m\e[31mbug (\e[36mb#{i}\e[31m):\e[0m #{b}"
         end if p['bugs']
-        p['todos'].each do |t|
-            puts "...\t\e[1m\e[33mtodo:\e[0m #{t}"
+        p['todos'].each_with_index do |t, i|
+            puts "...\t\e[1m\e[33mtask (\e[36mt#{i}\e[33m):\e[0m #{t}"
         end if p['todos']
         return true
     end
@@ -422,39 +419,29 @@ EOF
         return true
     end
     def file_bug(pname, bug)
-        puts "\e[1mfile-bug:\e[0m #{pname}"
         p = Projects.find(pname)
         return(warn("\e[31m\e[1mproject not found.\e[0m")) unless p
         p['bugs'] = [] unless p['bugs']
         p['bugs'] += [bug]
-        puts "\e[32m\e[1mdone!\e[0m"
         return true
     end
-    def file_todo(pname, todo)
-        puts "\e[1mfile-todo:\e[0m #{pname}"
+    def add_task(pname, todo)
         p = Projects.find(pname)
         return(warn("\e[31m\e[1mproject not found.\e[0m")) unless p
         p['todos'] = [] unless p['todos']
         p['todos'] += [todo]
-        puts "\e[32m\e[1mdone!\e[0m"
         return true
     end
-    def complete_bug(pname, bug)
-        puts "\e[1mcomplete-bug:\e[0m #{pname}"
+    def fix_bug_or_complete_task(pname, num)
         p = Projects.find(pname)
         return(warn("\e[31m\e[1mproject not found.\e[0m")) unless p
-        p['bugs'] = [] unless p['bugs']
-        p['bugs'] -= [bug]
-        puts "\e[32m\e[1mdone!\e[0m"
-        return true
-    end
-    def complete_todo(pname, todo)
-        puts "\e[1mcomplete-todo:\e[0m #{pname}"
-        p = Projects.find(pname)
-        return(warn("\e[31m\e[1mproject not found.\e[0m")) unless p
-        p['todos'] = [] unless p['todos']
-        p['todos'] -= [todo]
-        puts "\e[32m\e[1mdone!\e[0m"
+        if num =~ /^b(\d+)$/i
+            p['bugs'] -= [p['bugs'][$1.to_i]] if p['bugs']
+        elsif num =~ /^t(\d+)$/i
+            p['todos'] -= [p['todos'][$1.to_i]] if p['todos']
+        else
+            return warn("\e[31m\e[1minvalid number.\e[0m")
+        end
         return true
     end
     def what_to_do
@@ -462,18 +449,20 @@ EOF
         hghst = 0
         Projects.each{|p| hghst = p['name'].size if (p['name'].size > hghst) and (p['todos'] or p['bugs']) }
         Projects.each do |p|
-            p['bugs'].each do |b|
+            p['bugs'].each_with_index do |b, i|
                 print "...\e[1m#{p['name']}\e[0m"
                 (hghst-p['name'].size+4).times do |tm|
                     putc 0x20
                 end
+                print "\e[36m\e[1mb#{i}: \e[0m"
                 puts "\e[31m#{b}\e[0m"
             end if p['bugs']
-            p['todos'].each do |t|
+            p['todos'].each_with_index do |t, i|
                 print "...\e[1m#{p['name']}\e[0m"
                 (hghst-p['name'].size+4).times do |tm|
                     putc 0x20
                 end
+                print "\e[36m\e[1mt#{i}: \e[0m"
                 puts "\e[33m#{t}\e[0m"
             end if p['todos']
         end
