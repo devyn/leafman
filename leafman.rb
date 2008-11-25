@@ -138,26 +138,7 @@ module Leafman; extend self
             when /^colors$/i
                 @config['colors'] = ((argv.first =~ /^on$/i) ? true : false)
             when /^set-sync$/i
-                p = Projects.find(argv.first)
-                abort "\e[31m\e[1mproject not found.\e[0m" unless p
-                case p['scm']
-                when 'git'
-                    if argv[1] =~ /^on$/i
-                        p['fetch'] = 'origin'
-                    elsif argv[1] =~ /^off$/i
-                        p['fetch'] = nil
-                    else
-                        p['fetch'] = argv[1]
-                    end
-                when 'bzr'
-                    p['do_update'] = argv[1] =~ /^on$/i ? true : false
-                when 'hg'
-                    p['do_pull'] = argv[1] =~ /^on$/i ? true : false
-                when 'svn'
-                    abort "\e[31m\e[1mcan not set for Subversion.\e[0m"
-                else
-                    abort "\e[31m\e[1mproject does not use a valid SCM.\e[0m"
-                end
+                set_sync *argv
             when /^help$/i, nil
                 puts "\e[1m\e[36mL \e[32mE \e[33mA \e[36mF \e[32mM \e[33mA \e[36mN\e[0m  M1, The GREEN MEAN Managing MACHINE!"
                 puts "\e[1m\e[34musage:\e[0m #{$0} <command> [parameters...]"
@@ -495,6 +476,29 @@ EOF
                 end
                 puts "\e[33m#{t}\e[0m"
             end if p['todos']
+        end
+        return true
+    end
+    def set_sync(pname, opt)
+        p = Projects.find(pname)
+        return(warn("\e[31m\e[1mproject not found.\e[0m")) unless p
+        case p['scm']
+        when 'git'
+            if opt =~ /^on$/i
+                p['fetch'] = 'origin'
+            elsif opt =~ /^off$/i
+                p['fetch'] = nil
+            else
+                p['fetch'] = opt
+            end
+        when 'bzr'
+            p['do_update'] = opt =~ /^on$/i ? true : false
+        when 'hg'
+            p['do_pull'] = opt =~ /^on$/i ? true : false
+        when 'svn'
+            return warn("\e[31m\e[1mcan not set for Subversion.\e[0m")
+        else
+            return warn("\e[31m\e[1mproject does not use a valid SCM.\e[0m")
         end
         return true
     end
