@@ -37,6 +37,7 @@ module Leafman; extend self
     end
     module Projects; extend self
         def find pname
+            return nil unless pname.is_a? String
             return nil unless File.exists?(File.join(File.expand_path(PROJECT_DIR), pname, '.leafman-project'))
             return ProjectAccessor.new(pname)
         end
@@ -136,6 +137,27 @@ module Leafman; extend self
                 what_to_do *argv
             when /^colors$/i
                 @config['colors'] = ((argv.first =~ /^on$/i) ? true : false)
+            when /^set-sync$/i
+                p = Projects.find(argv.first)
+                abort "\e[31m\e[1mproject not found.\e[0m" unless p
+                case p['scm']
+                when 'git'
+                    if argv[1] =~ /^on$/i
+                        p['fetch'] = 'origin'
+                    elsif argv[1] =~ /^off$/i
+                        p['fetch'] = nil
+                    else
+                        p['fetch'] = argv[1]
+                    end
+                when 'bzr'
+                    p['do_update'] = argv[1] =~ /^on$/i ? true : false
+                when 'hg'
+                    p['do_pull'] = argv[1] =~ /^on$/i ? true : false
+                when 'svn'
+                    abort "\e[31m\e[1mcan not set for Subversion.\e[0m"
+                else
+                    abort "\e[31m\e[1mproject does not use a valid SCM.\e[0m"
+                end
             when /^help$/i, nil
                 puts "\e[1m\e[36mL \e[32mE \e[33mA \e[36mF \e[32mM \e[33mA \e[36mN\e[0m  M1, The GREEN MEAN Managing MACHINE!"
                 puts "\e[1m\e[34musage:\e[0m #{$0} <command> [parameters...]"
@@ -167,6 +189,7 @@ module Leafman; extend self
                 puts
                 puts "\e[1m\e[34mconfig commands:\e[0m"
                 puts "\e[1mcolors\e[0m on|off \e[33m# turn ANSI escape sequences on or off\e[0m"
+                puts "\e[1mset-sync\e[0m on|off|<git-remote> \e[33m# set the ability to sync on or off, or for git repositories set the remote to pull from\e[0m"
                 puts
                 puts "\e[1m\e[34mcreated by ~devyn\e[0m"
                 puts "this Leafman doesn't know \e[1m*who*\e[0m he is (hmm... possible easter egg hint?)"
