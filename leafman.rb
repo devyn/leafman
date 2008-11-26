@@ -12,6 +12,7 @@ Dir.glob(File.join(File.dirname(File.expand_path(__FILE__)), 'lib', 'commands', 
     load cf
 end
 load '.leafman-rc' if File.exists?('.leafman-rc')
+load File.join(File.expand_path(Leafman::PROJECT_DIR), ".leafman-rc") if File.exists?(File.join(File.expand_path(Leafman::PROJECT_DIR), ".leafman-rc"))
 if __FILE__ == $0
     Leafman.parse_args *ARGV
 end
