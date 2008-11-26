@@ -11,7 +11,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), 'lib', 'configs')
 Dir.glob(File.join(File.dirname(File.expand_path(__FILE__)), 'lib', 'commands', '*.rb')).each do |cf|
     load cf
 end
-load '.leafman-rc' rescue nil
+load '.leafman-rc' if File.exists?('.leafman-rc')
 if __FILE__ == $0
     Leafman.parse_args *ARGV
 end
