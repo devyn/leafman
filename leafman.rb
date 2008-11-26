@@ -8,7 +8,7 @@ require 'fileutils'
 require File.join(File.dirname(File.expand_path(__FILE__)), 'lib', 'extensions')
 require File.join(File.dirname(File.expand_path(__FILE__)), 'lib', 'projects')
 require File.join(File.dirname(File.expand_path(__FILE__)), 'lib', 'configs')
-Dir.glob(File.join(File.dirname(File.expand_path(__FILE__)), 'lib', 'commands', '*.rb')).each do |cf|
+Dir.glob(File.join(File.dirname(File.expand_path(__FILE__)), 'lib', 'commands', '*.rb')).sort.each do |cf|
     load cf
 end
 load '.leafman-rc' if File.exists?('.leafman-rc')
