@@ -37,7 +37,7 @@ module Leafman
             end
         end
         def each
-            names.each do |pname|
+            names.sort.each do |pname|
                 yield ProjectAccessor.new(pname)
             end
         end
