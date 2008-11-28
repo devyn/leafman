@@ -13,6 +13,17 @@ Leafman::Command.new "list", "", "list of all projects" do
             when 'hg'
                 scm_code = "\e[36m"
         end
-        puts "\e[1m*\e[0m\t#{scm_code}#{p['name']}\e[0m"
+        fetchable = false
+        case p['scm']
+            when 'git'
+                fetchable = p['fetch']
+            when 'svn'
+                fetchable = true
+            when 'bzr'
+                fetchable = p['do_update']
+            when 'hg'
+                fetchable = p['do_pull']
+        end
+        puts "\e[1m#{fetchable ? '<<' : '**'}\e[0m\t#{scm_code}#{p['name']}\e[0m"
     end
 end
