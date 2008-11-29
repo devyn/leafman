@@ -28,7 +28,7 @@ Leafman::Command.new "list", "", "list of all projects" do
             when 'darcs'
                 fetchable = p['do_pull']
         end
-        pushable = p['do_fetch']
+        pushable = p['do_push']
         eestr = nil
         if pushable and fetchable
             eestr = '><'
