@@ -2,9 +2,11 @@
 # Leafman M2, the LEAF way to get stuff done!
 module Leafman
     extend self
+    attr :config
 end
 require 'yaml'
 require 'fileutils'
+require 'rubygems' rescue nil
 require File.join(File.dirname(File.expand_path(__FILE__)), 'lib', 'extensions')
 require File.join(File.dirname(File.expand_path(__FILE__)), 'lib', 'projects')
 require File.join(File.dirname(File.expand_path(__FILE__)), 'lib', 'configs')
