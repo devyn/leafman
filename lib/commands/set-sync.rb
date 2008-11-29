@@ -11,12 +11,10 @@ Leafman::Command.new "set-sync", "<project-name> on|off|<git-remote>", "choose w
         else
             p['fetch'] = opt
         end
-    when 'bzr'
+    when 'bzr', 'svn'
         p['do_update'] = opt =~ /^on$/i ? true : false
     when 'hg', 'darcs'
         p['do_pull'] = opt =~ /^on$/i ? true : false
-    when 'svn'
-        return warn("\e[31m\e[1mcan not set for Subversion.\e[0m")
     else
         return warn("\e[31m\e[1mproject does not use a valid SCM.\e[0m")
     end

@@ -20,7 +20,7 @@ Leafman::Command.new "list", "", "list of all projects" do
             when 'git'
                 fetchable = p['fetch']
             when 'svn'
-                fetchable = true
+                fetchable = p['do_update']
             when 'bzr'
                 fetchable = p['do_update']
             when 'hg'
