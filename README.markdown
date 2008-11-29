@@ -24,6 +24,7 @@ This gives you a list of all projects.
 This shows detailed information on a project.
 
 Also, really useful:
+
     $ ruby leafman.rb help
 for all commands.
 
