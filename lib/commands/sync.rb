@@ -1,6 +1,6 @@
-Leafman::Command.new "sync", "", "syncs all enabled projects with the server" do
+Leafman::Command.new "sync", "[project-names...]", "syncs all enabled projects or [project-names...] with the server" do |*pnames|
     include Leafman::Mixin
-    Leafman::Projects.each do |p|
+    Leafman::Projects.each(*pnames) do |p|
         if (p['scm'] == 'git' and p['fetch'])
             puts "\e[1msync:\e[0m \e[32m#{p['name']}\e[0m"
             Dir.chdir(File.join(File.expand_path(Leafman::PROJECT_DIR), p['name'])) do

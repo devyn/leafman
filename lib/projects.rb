@@ -36,9 +36,10 @@ module Leafman
                 f.write YAML.dump(phash)
             end
         end
-        def each
-            names.sort.each do |pname|
-                yield Accessor.new(pname)
+        def each(*ns)
+            ns = names if ns.empty?
+            ns.sort.each do |pname|
+                yield Accessor.new(pname) if File.exists?(File.join(File.expand_path(PROJECT_DIR), pname, '.leafman-project'))
             end
         end
         def names
