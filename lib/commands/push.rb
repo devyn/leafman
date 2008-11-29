@@ -3,8 +3,10 @@ Leafman::Command.new "push", "[project-names...]", "pushes all distributed enabl
     Leafman::Projects.each(*pnames) do |p|
         if p['scm'] and (p['scm'] != 'svn') and p['do_push']
             puts "\e[1mpush:\e[0m #{p['name']}"
+            scm_spec = []
+            scm_spec << 'origin' if p['scm'] == 'git'
             Dir.chdir(File.join(File.expand_path(Leafman::PROJECT_DIR), p['name'])) do
-                system p['scm'], 'push'
+                system p['scm'], 'push', *scm_spec
             end
         end
     end
