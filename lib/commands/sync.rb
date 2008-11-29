@@ -21,6 +21,11 @@ Leafman::Command.new "sync", "", "syncs all enabled projects with the server" do
             Dir.chdir(File.join(File.expand_path(Leafman::PROJECT_DIR), p['name'])) do
                 system("hg", "pull") or warn("\e[31m\e[1mcould not pull for\e[0m \e[36m#{p['name']}\e[0m")
             end
+        elsif (p['scm'] == 'darcs') and p['do_pull']
+            puts "\e[1msync:\e[0m \e[35m#{p['name']}\e[0m"
+            Dir.chdir(File.join(File.expand_path(Leafman::PROJECT_DIR), p['name'])) do
+                system("darcs", "pull") or warn("\e[31m\e[1mcould not pull for\e[0m \e[35m#{p['name']}\e[0m")
+            end
         else
             next
         end

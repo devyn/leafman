@@ -8,6 +8,7 @@ Leafman::Command.new "import", "<directory>", "import <directory> as a project, 
     scm = 'svn' if File.directory?(File.join(File.expand_path(Leafman::PROJECT_DIR), File.basename(dir), ".svn"))
     scm = 'bzr' if File.directory?(File.join(File.expand_path(Leafman::PROJECT_DIR), File.basename(dir), ".bzr"))
     scm = 'hg' if File.directory?(File.join(File.expand_path(Leafman::PROJECT_DIR), File.basename(dir), ".hg"))
+    scm = 'darcs' if File.directory?(File.join(File.expand_path(Leafman::PROJECT_DIR), File.basename(dir), "_darcs"))
     puts((scm or 'none').upcase)
     puts "\e[1mcreate project config\e[0m"
     Leafman::Projects.add(File.basename(dir), 'type' => nil, 'scm' => scm)

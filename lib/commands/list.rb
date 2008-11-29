@@ -12,6 +12,8 @@ Leafman::Command.new "list", "", "list of all projects" do
                 scm_code = "\e[33m"
             when 'hg'
                 scm_code = "\e[36m"
+            when 'darcs'
+                scm_code = "\e[35m"
         end
         fetchable = false
         case p['scm']
@@ -22,6 +24,8 @@ Leafman::Command.new "list", "", "list of all projects" do
             when 'bzr'
                 fetchable = p['do_update']
             when 'hg'
+                fetchable = p['do_pull']
+            when 'darcs'
                 fetchable = p['do_pull']
         end
         puts "\e[1m#{fetchable ? '<<' : '**'}\e[0m\t#{scm_code}#{p['name']}\e[0m"
