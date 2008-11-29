@@ -28,6 +28,17 @@ Leafman::Command.new "list", "", "list of all projects" do
             when 'darcs'
                 fetchable = p['do_pull']
         end
-        puts "\e[1m#{fetchable ? '<<' : '**'}\e[0m\t#{scm_code}#{p['name']}\e[0m"
+        pushable = p['do_fetch']
+        eestr = nil
+        if pushable and fetchable
+            eestr = '><'
+        elsif pushable
+            eestr = '>>'
+        elsif fetchable
+            eestr = '<<'
+        else
+            eestr = '**'
+        end
+        puts "\e[1m#{eestr}\e[0m\t#{scm_code}#{p['name']}\e[0m"
     end
 end

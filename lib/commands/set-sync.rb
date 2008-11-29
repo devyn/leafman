@@ -16,6 +16,6 @@ Leafman::Command.new "set-sync", "<project-name> on|off|<git-remote>", "choose w
     when 'hg', 'darcs'
         p['do_pull'] = opt =~ /^on$/i ? true : false
     else
-        return warn("\e[31m\e[1mproject does not use a valid SCM.\e[0m")
+        warn("\e[31m\e[1mproject does not use a valid SCM.\e[0m")||true&&next
     end
 end
