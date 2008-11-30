@@ -3,6 +3,7 @@
 module Leafman
     extend self
     attr :config
+    VERSION = "m3"
 end
 require 'yaml'
 require 'fileutils'

@@ -41,6 +41,8 @@ EOF
         <a href="/what-to-do">what to do?</a>
     </div>
     #{ps}
+    <hr/>
+    <small><em>Powered by Leafman #{Leafman::VERSION}</em></small>
 </body>
 </html>
 EOF
@@ -52,13 +54,13 @@ EOF
                 ps = "<ul>\n"
                 Leafman::Projects.each do |p|
                     p['bugs'].each_with_index do |b, i|
-                        ps << "<li><strong>#{p['name']}</strong>"
-                        ps << "<strong style='color:#009999'>b#{i}</strong>: "
+                        ps << "<li><a class='scm-#{p['scm'] or 'none'}' href='/#{CGI.escape(p['name'])}.project'><strong>#{p['name']}</strong></a> "
+                        ps << "<strong style='color:#009999'>(b#{i})</strong>: "
                         ps << "<span class='bug'>#{CGI.escapeHTML(b)}</span></li>\n"
                     end if p['bugs']
                     p['todos'].each_with_index do |t, i|
-                        ps << "<li><strong class='scm-#{p['scm'] or 'none'}'>#{p['name']}</strong> "
-                        ps << "<strong style='color:#009999'>(b#{i})</strong>: "
+                        ps << "<li><a class='scm-#{p['scm'] or 'none'}' href='/#{CGI.escape(p['name'])}.project'><strong>#{p['name']}</strong></a> "
+                        ps << "<strong style='color:#009999'>(t#{i})</strong>: "
                         ps << "<span class='task'>#{CGI.escapeHTML(t)}</span></li>\n"
                     end if p['todos']
                 end
@@ -77,13 +79,16 @@ EOF
     </div>
     <h2>what to do?</h2>
     #{ps}
+    <hr/>
+    <small><em>Powered by Leafman #{Leafman::VERSION}</em></small>
 </body>
 </html>
 EOF
             when /^\/(.+)\.project$/
                 p = Leafman::Projects.find($1)
                 res['Content-Type'] = 'text/html'
-                res.body = <<EOF
+                if p
+                    res.body = <<EOF
 <html>
 <head>
     <link rel="stylesheet" type="text/css" href="/styles.css"/>
@@ -119,9 +124,15 @@ EOF
     sss << "</div>"
     sss if p['todos']
     }
+    <hr/>
+    <small><em>Powered by Leafman #{Leafman::VERSION}</em></small>
 </body>
 </html>
 EOF
+                else
+                    res.status = 404
+                    res.body = "<h1>404 - Project not found</h1>"
+                end
             else
                 res.status = 404
                 res['Content-Type'] = 'text/html'
