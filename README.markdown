@@ -34,3 +34,5 @@ A relatively new feature to Leafman is the ability to serve a web page with all 
 
     $ ruby leafman.rb serve
 Then, go to <http://localhost:8585>.
+
+Also, to note: most colors on the web interface are the same as they are on the console interface. (eg. for scm colors, bug/task colors, etc.)
