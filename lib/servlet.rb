@@ -102,7 +102,7 @@ EOF
     </div>
     <h2>#{CGI.escapeHTML($1)}</h2>
     <div>
-        #{"... uses <strong class='scm-git'>Git</strong>#{", pushes" if p['do_push']}#{", syncs from <strong>#{CGI.escapeHTML(p['fetch'])}</strong>" if p['fetch']}." if p['scm'] == 'git'}
+        #{"... uses <strong class='scm-git'>Git</strong>#{", pushes" if p['do_push']}#{", syncs with <strong>#{CGI.escapeHTML(p['fetch'])}</strong>" if p['fetch']}." if p['scm'] == 'git'}
         #{"... uses <strong class='scm-svn'>Subversion</strong>#{", pushes" if p['do_push']}#{", syncs" if p['do_update']}." if p['scm'] == 'svn'}
         #{"... uses <strong class='scm-bzr'>Bazaar</strong>#{", pushes" if p['do_push']}#{", syncs" if p['do_update']}." if p['scm'] == 'bzr'}
         #{"... uses <strong class='scm-hg'>Mercurial</strong>#{", pushes" if p['do_push']}#{", syncs" if p['do_pull']}." if p['scm'] == 'hg'}
