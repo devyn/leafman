@@ -28,3 +28,9 @@ Also, really useful:
     $ ruby leafman.rb help
 for all commands.
 
+Web Interface
+-------------------
+A relatively new feature to Leafman is the ability to serve a web page with all projects. This is useful if, for example, you are on a large LAN and want to share projects. To start it:
+
+    $ ruby leafman.rb serve
+Then, go to <http://localhost:8585>.
