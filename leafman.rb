@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-# Leafman M2, the LEAF way to get stuff done!
+# Leafman, the LEAF way to get stuff done!
 module Leafman
     extend self
     attr :config
