@@ -25,6 +25,9 @@ module Leafman
                 end
                 r
             end
+            def dir(*plus)
+                File.join(File.expand_path(PROJECT_DIR), @pname, *plus)
+            end
         end
         def find pname
             return nil unless pname.is_a? String

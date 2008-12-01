@@ -18,6 +18,7 @@ h1                              { background-color: #999999;
                                   color:            #FFFFFF;
                                   padding-left:     15px;    }
 a, a:visited                    { color:            #000000; }
+.current-rev                    { color:            #996600; }
 EOF
         def do_GET(req,res)
             case req.path
@@ -108,6 +109,12 @@ EOF
         #{"... uses <strong class='scm-hg'>Mercurial</strong>#{", pushes" if p['do_push']}#{", syncs" if p['do_pull']}." if p['scm'] == 'hg'}
         #{"... uses <strong class='scm-darcs'>Darcs</strong>#{", pushes" if p['do_push']}#{", syncs" if p['do_pull']}." if p['scm'] == 'darcs'}
         #{"... doesn't use <strong>version control</strong>." unless p['scm']}
+    </div>
+    <div>
+        #{Dir.chdir(p.dir) { "... at revision <strong class='current-rev'>#{`git rev-parse --short HEAD`.chomp}</strong>." } if p['scm'] == 'git'}
+        #{Dir.chdir(p.dir) { "... at revision <strong class='current-rev'>#{`svnversion`.chomp}</strong>." } if p['scm'] == 'svn'}
+        #{Dir.chdir(p.dir) { "... at revision <strong class='current-rev'>#{`bzr log -r -1`.scan(/^revno: (\d+)$/).flatten.first}</strong>." } if p['scm'] == 'bzr'}
+        #{Dir.chdir(p.dir) { "... at revision <strong class='current-rev'>#{`hg identify`.chomp}</strong>." } if p['scm'] == 'hg'}
     </div>
     #{"<div>... is a <strong>#{CGI.escapeHTML(p['type'].capitalize)}</strong> project.</div>" if p['type']}
     #{sss = "<div>\n"
