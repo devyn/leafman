@@ -2,7 +2,7 @@ require 'webrick'
 require 'cgi'
 module Leafman
     class Servlet < WEBrick::HTTPServlet::AbstractServlet
-        STYLESHEET = <<EOF
+        STYLESHEET = <<-EOF
 body {
     font-family: sans-serif;
 }
@@ -19,6 +19,9 @@ h1                              { background-color: #999999;
                                   padding-left:     15px;    }
 a, a:visited                    { color:            #000000; }
 .current-rev                    { color:            #996600; }
+a.pdir,   a.pdir:visited        { color:            #660033; }
+a.indir,  a.indir:visited       { color:            #006633; }
+a.infile, a.infile:visited      { color:            #663300; }
 EOF
         def do_GET(*args)
             self.class.class_eval { remove_const :STYLESHEET if defined?(STYLESHEET) }
@@ -34,7 +37,7 @@ EOF
                     ps << "<li><a class=\"scm-#{p['scm'] or 'none'}\" href=\"/#{CGI.escape(p['name'])}.project\">#{CGI.escapeHTML(p['name'])}</a></li>\n"
                 end
                 ps << "</ul>\n"
-                res.body = <<EOF
+                res.body = <<-EOF
 <html>
 <head>
     <link rel="stylesheet" type="text/css" href="/styles.css"/>
@@ -90,11 +93,11 @@ EOF
 </body>
 </html>
 EOF
-            when /^\/(.+)\.project$/
+            when /^\/(.+)\.project\/?$/
                 p = Leafman::Projects.find($1)
                 res['Content-Type'] = 'text/html'
                 if p
-                    res.body = <<EOF
+                    res.body = <<-EOF
 <html>
 <head>
     <link rel="stylesheet" type="text/css" href="/styles.css"/>
@@ -105,6 +108,7 @@ EOF
     <div>
         <a href="/">home</a>
         <a href="/what-to-do">what to do?</a>
+        <a href="/#{CGI.escape($1)}.project/files/">file directory</a>
     </div>
     <h2>#{CGI.escapeHTML($1)}</h2>
     <div>
@@ -141,6 +145,62 @@ EOF
 </body>
 </html>
 EOF
+                else
+                    res.status = 404
+                    res.body = "<h1>404 - Project not found</h1>"
+                end
+            when /^\/(.+)\.project\/files\/(.*)$/
+                unless Leafman.config['web_show_files']
+                    res.status = 403
+                    res.body = "<h1>403 - Forbidden</h1><h4>Leafman's settings currently do not allow file viewing.</h4>"
+                    res['Content-Type'] = 'text/html'
+                    return
+                end
+                s1, s2 = $1, $2
+                res['Content-Type'] = 'text/html'
+                if Leafman::Projects.find(s1)
+                    pth = File.expand_path(File.join(File.expand_path(Leafman::PROJECT_DIR), s1, s2))
+                    unless pth =~ /^#{Regexp.escape(File.join(File.expand_path(Leafman::PROJECT_DIR), s1))}/
+                        res.status = 403
+                        res.body = "<h1>403 - Forbidden</h1>"
+                        res['Content-Type'] = 'text/html'
+                        return
+                    end # malicious attack prevention
+                    if File.directory? pth
+                        dd = ""
+                        ff = ""
+                        (Dir.entries(pth).sort - %w(. ..)).each do |e|
+                            (File.directory?(File.join(pth,e)) ? dd : ff) << "<div><a class='in#{File.directory?(File.join(pth,e)) ? 'dir' : 'file'}' href=\"/#{CGI.escape(s1)}.project/files/#{CGI.escape(s2)}/#{CGI.escape(e)}\">#{CGI.escapeHTML(e)}</a></div>\n"
+                        end
+                        res['Content-Type'] = 'text/html'
+                        res.body = <<-EOF
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="/styles.css"/>
+    <title>Leafman - files: #{CGI.escapeHTML(s1)}/#{CGI.escapeHTML(s2)}</title>
+</head>
+<body>
+    <h1>Leafman</h1>
+    <div>
+        <a href="/">home</a>
+        <a href="/what-to-do">what to do?</a>
+        <a href="/#{CGI.escape(s1)}.project">back to project</a>
+    </div>
+    <h2>Directory of #{CGI.escapeHTML(s1)}/#{CGI.escapeHTML(s2)}</h2>
+    #{"<div><a class='pdir' href=\"/#{CGI.escape(s1)}.project/files/#{CGI.escape(File.dirname(s2))}\">Parent Directory</a></div>" unless s2.empty?}
+    #{dd}
+    #{ff}
+</body>
+</html>
+EOF
+                    elsif File.file? pth
+                        res['Content-Type'] = 'text/plain'
+                        res.body = File.read(pth)
+                    else
+                        res.status = 404
+                        res.body = "<h1>404 - File not found</h1>"
+                        res['Content-Type'] = 'text/html'
+                    end
                 else
                     res.status = 404
                     res.body = "<h1>404 - Project not found</h1>"
