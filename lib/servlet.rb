@@ -20,7 +20,12 @@ h1                              { background-color: #999999;
 a, a:visited                    { color:            #000000; }
 .current-rev                    { color:            #996600; }
 EOF
-        def do_GET(req,res)
+        def do_GET(*args)
+            self.class.class_eval { remove_const :STYLESHEET if defined?(STYLESHEET) }
+            load __FILE__
+            real_GET(*args)
+        end
+        def real_GET(req,res)
             case req.path
             when '/'
                 res['Content-Type'] = 'text/html'
@@ -110,12 +115,12 @@ EOF
         #{"... uses <strong class='scm-darcs'>Darcs</strong>#{", pushes" if p['do_push']}#{", syncs" if p['do_pull']}." if p['scm'] == 'darcs'}
         #{"... doesn't use <strong>version control</strong>." unless p['scm']}
     </div>
-    <div>
+    #{"<div>
         #{Dir.chdir(p.dir) { "... at revision <strong class='current-rev'>#{`git rev-parse --short HEAD`.chomp}</strong>." } if p['scm'] == 'git'}
         #{Dir.chdir(p.dir) { "... at revision <strong class='current-rev'>#{`svnversion`.chomp}</strong>." } if p['scm'] == 'svn'}
         #{Dir.chdir(p.dir) { "... at revision <strong class='current-rev'>#{`bzr log -r -1`.scan(/^revno: (\d+)$/).flatten.first}</strong>." } if p['scm'] == 'bzr'}
         #{Dir.chdir(p.dir) { "... at revision <strong class='current-rev'>#{`hg identify`.chomp}</strong>." } if p['scm'] == 'hg'}
-    </div>
+    </div>" if Leafman.config['show_revision']}
     #{"<div>... is a <strong>#{CGI.escapeHTML(p['type'].capitalize)}</strong> project.</div>" if p['type']}
     #{sss = "<div>\n"
     p['bugs'].each_with_index do |b, i|
