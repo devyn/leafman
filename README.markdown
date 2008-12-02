@@ -36,3 +36,13 @@ A relatively new feature to Leafman is the ability to serve a web page with all 
 Then, go to <http://localhost:8585>.
 
 Also, to note: most colors on the web interface are the same as they are on the console interface. (eg. for scm colors, bug/task colors, etc.)
+
+Web Files
+------------------
+You can now view the files of a project on the web interface, if web_show_files is on. This also allows pulling for Git, Bazaar, and Darcs, but does not allow pulling for Subversion or Mercurial.
+
+    $ git clone http://localhost:8585/<project>.project/files/.git/ <where-to-clone-to> # using git
+    $ bzr co http://localhost:8585/<project>.project/files/ <where-to-checkout-to> # using bazaar
+    $ darcs get --lazy http://localhost:8585/<project>.project/files/ <where-to-get-to> # using darcs
+    
+Currently, it is unknown to me why Mercurial isn't working, but such is the way of life.
