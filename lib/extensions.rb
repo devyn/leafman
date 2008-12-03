@@ -17,6 +17,7 @@ module Leafman
         COMMANDS.select{|c|c.name =~ /^#{Regexp.escape(name)}$/i }[0]
     end
     def parse_args(*argv)
+        @config = {}
         load_conf rescue warn("\e[33mcouldn't load the config file; ignore this if you are running INIT\e[0m")
         c = get_command(argv.shift)
         abort "\e[31m\e[1minvalid command\e[0m" unless c
