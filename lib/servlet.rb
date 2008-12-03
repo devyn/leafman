@@ -48,6 +48,7 @@ EOF
     <div>
         <a href="/">home</a>
         <a href="/what-to-do">what to do?</a>
+        <a href="/popularity-contest">popularity contest</a>
     </div>
     #{ps}
     <hr/>
@@ -74,7 +75,7 @@ EOF
                     end if p['todos']
                 end
                 ps << "</ul>\n"
-                res.body = <<EOF
+                res.body = <<-EOF
 <html>
 <head>
     <link rel="stylesheet" type="text/css" href="/styles.css"/>
@@ -85,6 +86,7 @@ EOF
     <div>
         <a href="/">home</a>
         <a href="/what-to-do">what to do?</a>
+        <a href="/popularity-contest">popularity contest</a>
     </div>
     <h2>what to do?</h2>
     #{ps}
@@ -93,6 +95,61 @@ EOF
 </body>
 </html>
 EOF
+            when '/popularity-contest'
+                res['Content-Type'] = 'text/html'
+                res.body = <<-EOF
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="/styles.css"/>
+    <title>Leafman - popularity contest</title>
+</head>
+<body>
+    <h1>Leafman</h1>
+    <div>
+        <a href="/">home</a>
+        <a href="/what-to-do">what to do?</a>
+        <a href="/popularity-contest">popularity contest</a>
+    </div>
+    <img src='/popularity-contest.png'/>
+</body>
+</html>
+EOF
+            when '/popularity-contest.png'
+                    t, g, s, b, h, d, o = [0]*7
+                    Leafman::Projects.each do |p|
+                        t += 1
+                        case p['scm']
+                            when 'git'
+                                g += 1
+                            when 'svn'
+                                s += 1
+                            when 'bzr'
+                                b += 1
+                            when 'hg'
+                                h += 1
+                            when 'darcs'
+                                d += 1
+                            else
+                                o += 1
+                        end
+                    end
+                    require 'gruff'
+                    pi = Gruff::Pie.new 600
+                    pi.theme = {
+                        :colors => %w(green blue yellow cyan purple #666666),
+                        :marker_color => 'black',
+                        :font_color => '#333333',
+                        :background_colors => %w(white white)
+                    }
+                    pi.title = "Popularity Contest"
+                    pi.data 'Git', g
+                    pi.data 'Subversion', s
+                    pi.data 'Bazaar', b
+                    pi.data 'Mercurial', h
+                    pi.data 'Darcs', d
+                    pi.data 'Other', o
+                    res['Content-Type'] = 'image/png'
+                    res.body = pi.to_blob('PNG')
             when /^\/(.+)\.project\/?$/
                 p = Leafman::Projects.find($1)
                 res['Content-Type'] = 'text/html'
@@ -108,6 +165,7 @@ EOF
     <div>
         <a href="/">home</a>
         <a href="/what-to-do">what to do?</a>
+        <a href="/popularity-contest">popularity contest</a>
         <a href="/#{CGI.escape($1)}.project/files/">file directory</a>
     </div>
     <h2>#{CGI.escapeHTML($1)}</h2>
@@ -184,6 +242,7 @@ EOF
     <div>
         <a href="/">home</a>
         <a href="/what-to-do">what to do?</a>
+        <a href="/popularity-contest">popularity contest</a>
         <a href="/#{CGI.escape(s1)}.project">back to project</a>
     </div>
     <h2>Directory of #{CGI.escapeHTML(s1)}/#{CGI.escapeHTML(s2)}</h2>
