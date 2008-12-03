@@ -45,4 +45,9 @@ You can now view the files of a project on the web interface, if web_show_files 
     $ bzr co http://localhost:8585/<project>.project/files/ <where-to-checkout-to> # using bazaar
     $ darcs get --lazy http://localhost:8585/<project>.project/files/ <where-to-get-to> # using darcs
     
-Currently, it is unknown to me why Mercurial isn't working, but such is the way of life.
+Mercurial is not working because static-http support is broken, and will not be supported until it is fixed.
+
+**New!** Easy cloning:
+
+    $ ruby leafman.rb clone <project-name> [host[:port]] # waaay easier
+
