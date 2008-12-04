@@ -6,6 +6,7 @@ require 'net/http'
 require 'open-uri'
 require 'hpricot'
 require 'time'
+require 'fileutils'
 class Synkage
     attr :base_url, :sync_into
     def initialize(base_url, sync_into)
@@ -44,8 +45,8 @@ class Synkage
     def unescape(url)
         url.gsub(/\%([A-Fa-f0-9]{1,2})/){$1.to_i(16).chr}
     end
-    def expand_dir(for_what)
-        
+    def expand_dir_for *whats
+        whats.each {|what| FileUtils.mkdir_p(File.dirname(local_path_for(what))) }
     end
     def download(what)
         
