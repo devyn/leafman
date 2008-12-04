@@ -2,8 +2,10 @@
 # Once done, this will be part of Leafman.
 require 'rubygems' rescue nil # it doesn't matter if they don't have RubyGems installed, it just makes it easier.
 require 'uri'
+require 'net/http'
 require 'open-uri'
 require 'hpricot'
+require 'time'
 class Synkage
     attr :base_url, :sync_into
     def initialize(base_url, sync_into)
@@ -25,7 +27,10 @@ class Synkage
         return whats
     end
     def check_up_to_date(what)
-        
+        return false unless File.exists?(local_path_for(what))
+        burl_uri = URI.parse(escape(@base_url))
+        mtime = Time.parse(Net::HTTP.start(burl_uri.host, burl_uri.port){|http|http.head(burl_uri.path+"/#{what}")['Synkage-Last-Modified']})
+        return(mtime == File.stat(local_path_for(what)).mtime)
     end
     def local_path_for what
         File.join(@sync_into, what)
