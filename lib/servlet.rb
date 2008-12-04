@@ -34,7 +34,7 @@ EOF
                 res['Content-Type'] = 'text/html'
                 ps = "<ul>\n"
                 Leafman::Projects.each do |p|
-                    ps << "<li><a class=\"scm-#{p['scm'] or 'none'}\" href=\"/#{CGI.escape(p['name'])}.project\">#{CGI.escapeHTML(p['name'])}</a></li>\n"
+                    ps << "<li><a class=\"scm-#{p['scm'] or 'none'}\" href=\"/#{p['name']}.project\">#{CGI.escapeHTML(p['name'])}</a></li>\n"
                 end
                 ps << "</ul>\n"
                 res.body = <<-EOF
@@ -64,12 +64,12 @@ EOF
                 ps = "<ul>\n"
                 Leafman::Projects.each do |p|
                     p['bugs'].each_with_index do |b, i|
-                        ps << "<li><a class='scm-#{p['scm'] or 'none'}' href='/#{CGI.escape(p['name'])}.project'><strong>#{p['name']}</strong></a> "
+                        ps << "<li><a class='scm-#{p['scm'] or 'none'}' href='/#{p['name']}.project'><strong>#{p['name']}</strong></a> "
                         ps << "<strong style='color:#009999'>(b#{i})</strong>: "
                         ps << "<span class='bug'>#{CGI.escapeHTML(b)}</span></li>\n"
                     end if p['bugs']
                     p['todos'].each_with_index do |t, i|
-                        ps << "<li><a class='scm-#{p['scm'] or 'none'}' href='/#{CGI.escape(p['name'])}.project'><strong>#{p['name']}</strong></a> "
+                        ps << "<li><a class='scm-#{p['scm'] or 'none'}' href='/#{p['name']}.project'><strong>#{p['name']}</strong></a> "
                         ps << "<strong style='color:#009999'>(t#{i})</strong>: "
                         ps << "<span class='task'>#{CGI.escapeHTML(t)}</span></li>\n"
                     end if p['todos']
@@ -246,7 +246,7 @@ EOF
         <a href="/#{s1}.project">back to project</a>
     </div>
     <h2>Directory of #{CGI.escapeHTML(s1)}/#{CGI.escapeHTML(s2)}</h2>
-    #{"<div><a class='pdir' href=\"/#{CGI.escape(s1)}.project/files/#{File.dirname(s2)}\">Parent Directory</a></div>" unless s2.empty?}
+    #{"<div><a class='pdir' href=\"/#{s1}.project/files/#{File.dirname(s2)}\">Parent Directory</a></div>" unless s2.empty?}
     #{dd}
     #{ff}
 </body>
