@@ -10,7 +10,7 @@ require 'fileutils'
 module Leafman
     module Cloneable; extend self
         def clone_info(project_name, host='localhost', port=8585)
-            project_page = Hpricot(open("http://#{host}:#{port}/#{project_name}.project/").read) rescue(return({:error => "404 - Project not found"}))
+            project_page = Hpricot(open("http://#{host}:#{port}/#{project_name}.project/".gsub(/[^A-Za-z0-9:\/.-_]/){|input|"%"+input[0].to_s(16)}).read) rescue(return({:error => $!.message}))
             if project_page.at(".scm-git")
                 return({:scm => 'git', :run => ['git', 'clone', "http://#{host}:#{port}/#{project_name}.project/files/.git/", File.join(File.expand_path(Leafman::PROJECT_DIR), project_name)]})
             elsif project_page.at(".scm-svn")
@@ -25,7 +25,7 @@ module Leafman
                 files = {}
                 # follow all links
                 follower = proc do |url, into|
-                    dir_page = Hpricot(open(url).read)
+                    dir_page = Hpricot(open(url.gsub(/[^A-Za-z0-9:\/.-_]/){|input|"%"+input[0].to_s(16)}).read)
                     dir_page.search(".indir").each do |elem|
                         follower.call("http://#{host}:#{port}"+elem[:href], File.join(into, elem.innerText))
                     end
@@ -44,7 +44,7 @@ module Leafman
             end
         end
         def download(src, dest)
-            uri = URI.parse(src)
+            uri = URI.parse(src.gsub(/[^A-Za-z0-9:\/.-_]/){|input|"%"+input[0].to_s(16)})
             f = File.open(dest, 'w')
             Net::HTTP.start(uri.host, uri.port) do |http|
                 Leafman.print "\e[1mdownloading\e[0m #{src} "
