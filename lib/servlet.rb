@@ -166,7 +166,7 @@ EOF
         <a href="/">home</a>
         <a href="/what-to-do">what to do?</a>
         <a href="/popularity-contest">popularity contest</a>
-        <a href="/#{CGI.escape($1)}.project/files/">file directory</a>
+        <a href="/#{$1}.project/files/">file directory</a>
     </div>
     <h2>#{CGI.escapeHTML($1)}</h2>
     <div>
@@ -228,7 +228,7 @@ EOF
                         dd = ""
                         ff = ""
                         (Dir.entries(pth).sort - %w(. .. .leafman-project .git .svn .bzr .hg _darcs)).each do |e|
-                            (File.directory?(File.join(pth,e)) ? dd : ff) << "<div><a class='in#{File.directory?(File.join(pth,e)) ? 'dir' : 'file'}' href=\"/#{CGI.escape(s1)}.project/files/#{CGI.escape(s2)}/#{CGI.escape(e)}\">#{CGI.escapeHTML(e)}</a></div>\n"
+                            (File.directory?(File.join(pth,e)) ? dd : ff) << "<div><a class='in#{File.directory?(File.join(pth,e)) ? 'dir' : 'file'}' href=\"/#{s1}.project/files/#{s2}/#{e}\">#{CGI.escapeHTML(e)}</a></div>\n"
                         end
                         res['Content-Type'] = 'text/html'
                         res.body = <<-EOF
@@ -243,10 +243,10 @@ EOF
         <a href="/">home</a>
         <a href="/what-to-do">what to do?</a>
         <a href="/popularity-contest">popularity contest</a>
-        <a href="/#{CGI.escape(s1)}.project">back to project</a>
+        <a href="/#{s1}.project">back to project</a>
     </div>
     <h2>Directory of #{CGI.escapeHTML(s1)}/#{CGI.escapeHTML(s2)}</h2>
-    #{"<div><a class='pdir' href=\"/#{CGI.escape(s1)}.project/files/#{CGI.escape(File.dirname(s2))}\">Parent Directory</a></div>" unless s2.empty?}
+    #{"<div><a class='pdir' href=\"/#{CGI.escape(s1)}.project/files/#{File.dirname(s2)}\">Parent Directory</a></div>" unless s2.empty?}
     #{dd}
     #{ff}
 </body>

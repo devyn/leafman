@@ -6,22 +6,21 @@ require 'net/http'
 require 'hpricot'
 require 'uri'
 require 'open-uri'
-require 'cgi'
 require 'fileutils'
 module Leafman
     module Cloneable; extend self
         def clone_info(project_name, host='localhost', port=8585)
-            project_page = Hpricot(open("http://#{host}:#{port}/#{CGI.escape(project_name)}.project/").read) rescue(return({:error => "404 - Project not found"}))
+            project_page = Hpricot(open("http://#{host}:#{port}/#{project_name}.project/").read) rescue(return({:error => "404 - Project not found"}))
             if project_page.at(".scm-git")
-                return({:scm => 'git', :run => ['git', 'clone', "http://#{host}:#{port}/#{CGI.escape(project_name)}.project/files/.git/", File.join(File.expand_path(Leafman::PROJECT_DIR), project_name)]})
+                return({:scm => 'git', :run => ['git', 'clone', "http://#{host}:#{port}/#{project_name}.project/files/.git/", File.join(File.expand_path(Leafman::PROJECT_DIR), project_name)]})
             elsif project_page.at(".scm-svn")
                 return({:scm => 'svn', :error => "No clone support for Subversion"})
             elsif project_page.at(".scm-bzr")
-                return({:scm => 'bzr', :run => ['bzr', 'co', "http://#{host}:#{port}/#{CGI.escape(project_name)}.project/files/", File.join(File.expand_path(Leafman::PROJECT_DIR), project_name)]})
+                return({:scm => 'bzr', :run => ['bzr', 'co', "http://#{host}:#{port}/#{project_name}.project/files/", File.join(File.expand_path(Leafman::PROJECT_DIR), project_name)]})
             elsif project_page.at(".scm-hg")
                 return({:scm => 'hg', :error => "No clone support for Mercurial (yet!)"})
             elsif project_page.at(".scm-darcs")
-                return({:scm => 'darcs', :run => ['darcs', 'get', '--lazy', "http://#{host}:#{port}/#{CGI.escape(project_name)}.project/files/", File.join(File.expand_path(Leafman::PROJECT_DIR), project_name)]})
+                return({:scm => 'darcs', :run => ['darcs', 'get', '--lazy', "http://#{host}:#{port}/#{project_name}.project/files/", File.join(File.expand_path(Leafman::PROJECT_DIR), project_name)]})
             else
                 files = {}
                 # follow all links
@@ -34,7 +33,7 @@ module Leafman
                         files["http://#{host}:#{port}"+elem[:href]] = File.join(into, elem.innerText)
                     end
                 end
-                follower.call("http://#{host}:#{port}/#{CGI.escape(project_name)}.project/files/", File.join(File.expand_path(Leafman::PROJECT_DIR), project_name))
+                follower.call("http://#{host}:#{port}/#{project_name}.project/files/", File.join(File.expand_path(Leafman::PROJECT_DIR), project_name))
                 return({:download => files})
             end
         end
