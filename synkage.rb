@@ -24,7 +24,7 @@ class Synkage
         do_follow.call(escape(@base_url))
         return whats
     end
-    def check_updated(what)
+    def check_up_to_date(what)
         
     end
     def escape(url)
