@@ -27,6 +27,12 @@ class Synkage
     def check_up_to_date(what)
         
     end
+    def local_path_for what
+        File.join(@sync_into, what)
+    end
+    def remote_path_for what
+        "#{@base_url}/#{what}"
+    end
     def escape(url)
         url.gsub(/[^A-Za-z0-9:\/.-_]/){|input|"%"+input[0].to_s(16)}
     end
