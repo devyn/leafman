@@ -49,6 +49,13 @@ class Synkage
         whats.each {|what| FileUtils.mkdir_p(File.dirname(local_path_for(what))) }
     end
     def download(what)
-        
+        uri = URI.parse(escape(remote_path_for(what)))
+        f = File.open(local_path_for(what), 'w')
+        Net::HTTP.start uri.host, uri.port do |http|
+            http.request_get uri.path do |res|
+                res.read_body {|seg| f.write seg}
+            end
+        end
+        f.close
     end
 end
