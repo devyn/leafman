@@ -254,6 +254,7 @@ EOF
 EOF
                     elsif File.file? pth
                         res['Content-Type'] = 'text/plain'
+                        res['Synkage-Last-Modified'] = File.stat(pth).mtime.to_s
                         res.body = File.read(pth)
                     else
                         res.status = 404
