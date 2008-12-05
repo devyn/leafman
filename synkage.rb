@@ -18,10 +18,10 @@ class Synkage
         do_follow = proc do |url|
             page = Hpricot(open(url).read)
             burl_uri = URI.parse(escape(@base_url))
-            page.search('a.indir').each do |elem|
+            page.search('a.dir').each do |elem|
                 do_follow.call(escape("http://#{burl_uri.host}:#{burl_uri.port}#{elem[:href]}"))
             end
-            page.search('a.infile').each do |elem|
+            page.search('a.file').each do |elem|
                 whats << elem[:href].sub(/^#{Regexp.escape(unescape(burl_uri.path))}/, '').sub(/^\//, "")
             end
         end
@@ -57,6 +57,7 @@ class Synkage
         f = File.open(local_path_for(what), 'w')
         Net::HTTP.start uri.host, uri.port do |http|
             http.request_get uri.path do |res|
+                f.chmod res['UNIX-Mode'].to_i(8)
                 res.read_body {|seg| f.write seg}
             end
         end
