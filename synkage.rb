@@ -7,12 +7,13 @@ require 'open-uri'
 require 'hpricot'
 require 'time'
 require 'fileutils'
+require 'digest/sha2'
 class Synkage
     attr :base_url, :sync_into
     def initialize(base_url, sync_into)
         @base_url, @sync_into = base_url, sync_into
     end
-    def recursive_follow
+    def fetch_whats
         whats = []
         do_follow = proc do |url|
             page = Hpricot(open(url).read)
@@ -27,11 +28,11 @@ class Synkage
         do_follow.call(escape(@base_url))
         return whats
     end
-    def check_up_to_date(what)
+    def up_to_date? what
         return false unless File.exists?(local_path_for(what))
         burl_uri = URI.parse(escape(@base_url))
-        mtime = Time.parse(Net::HTTP.start(burl_uri.host, burl_uri.port){|http|http.head(burl_uri.path+"/#{what}")['Synkage-Last-Modified']})
-        return(mtime == File.stat(local_path_for(what)).mtime)
+        hsh = Net::HTTP.start(burl_uri.host, burl_uri.port){|http|http.head(burl_uri.path+"/#{what}")['SHA2-Hash']}
+        return(hsh == Digest::SHA2.file(local_path_for(what)).hexdigest)
     end
     def local_path_for what
         File.join(@sync_into, what)
@@ -47,6 +48,9 @@ class Synkage
     end
     def expand_dir_for *whats
         whats.each {|what| FileUtils.mkdir_p(File.dirname(local_path_for(what))) }
+    end
+    def download_each_of *whats
+        whats.each {|what| download(what) unless up_to_date? what }
     end
     def download(what)
         uri = URI.parse(escape(remote_path_for(what)))
