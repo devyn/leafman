@@ -20,8 +20,8 @@ h1                              { background-color: #999999;
 a, a:visited                    { color:            #000000; }
 .current-rev                    { color:            #996600; }
 a.pdir,   a.pdir:visited        { color:            #660033; }
-a.indir,  a.indir:visited       { color:            #006633; }
-a.infile, a.infile:visited      { color:            #663300; }
+a.dir,     a.dir:visited        { color:            #006633; }
+a.file,   a.file:visited        { color:            #663300; }
 EOF
         def do_GET(*args)
             self.class.class_eval { remove_const :STYLESHEET if defined?(STYLESHEET) }
@@ -228,7 +228,7 @@ EOF
                         dd = ""
                         ff = ""
                         (Dir.entries(pth).sort - %w(. ..)).each do |e|
-                            (File.directory?(File.join(pth,e)) ? dd : ff) << "<div><a class='in#{File.directory?(File.join(pth,e)) ? 'dir' : 'file'}' href=\"/#{s1}.project/files/#{s2}/#{e}\">#{CGI.escapeHTML(e)}</a></div>\n"
+                            (File.directory?(File.join(pth,e)) ? dd : ff) << "<div><a class='#{File.directory?(File.join(pth,e)) ? 'dir' : 'file'}' href=\"/#{s1}.project/files/#{s2}/#{e}\">#{CGI.escapeHTML(e)}</a></div>\n"
                         end
                         res['Content-Type'] = 'text/html'
                         res.body = <<-EOF
