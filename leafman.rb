@@ -5,14 +5,15 @@ module Leafman
     attr :config
     VERSION = "m3.1-web"
 end
+$: << File.dirname(File.expand_path(__FILE__))
 require 'yaml'
 require 'fileutils'
 require 'rubygems' rescue nil
-require File.join(File.dirname(File.expand_path(__FILE__)), 'lib', 'extensions')
-require File.join(File.dirname(File.expand_path(__FILE__)), 'lib', 'projects')
-require File.join(File.dirname(File.expand_path(__FILE__)), 'lib', 'configs')
-require File.join(File.dirname(File.expand_path(__FILE__)), 'lib', 'servlet')
-require File.join(File.dirname(File.expand_path(__FILE__)), 'lib', 'cloneable')
+require 'lib/extensions'
+require 'lib/projects'
+require 'lib/configs'
+require 'lib/servlet'
+require 'lib/cloneable'
 Dir.glob(File.join(File.dirname(File.expand_path(__FILE__)), 'lib', 'commands', '*.rb')).sort.each do |cf|
     load cf
 end
