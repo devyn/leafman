@@ -227,7 +227,7 @@ EOF
                     if File.directory? pth
                         dd = ""
                         ff = ""
-                        (Dir.entries(pth).sort - %w(. .. .leafman-project .git .svn .bzr .hg _darcs)).each do |e|
+                        (Dir.entries(pth).sort - %w(. ..)).each do |e|
                             (File.directory?(File.join(pth,e)) ? dd : ff) << "<div><a class='in#{File.directory?(File.join(pth,e)) ? 'dir' : 'file'}' href=\"/#{s1}.project/files/#{s2}/#{e}\">#{CGI.escapeHTML(e)}</a></div>\n"
                         end
                         res['Content-Type'] = 'text/html'
