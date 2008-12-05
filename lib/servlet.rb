@@ -254,7 +254,8 @@ EOF
 EOF
                     elsif File.file? pth
                         res['Content-Type'] = 'text/plain'
-                        res['Synkage-Last-Modified'] = File.stat(pth).mtime.to_s
+                        require 'digest/sha2'
+                        res['SHA2-Hash'] = Digest::SHA2.file(pth).hexdigest
                         res.body = File.read(pth)
                     else
                         res.status = 404
