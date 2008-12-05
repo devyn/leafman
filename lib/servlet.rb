@@ -256,6 +256,7 @@ EOF
                         res['Content-Type'] = 'text/plain'
                         require 'digest/sha2'
                         res['SHA2-Hash'] = Digest::SHA2.file(pth).hexdigest
+                        res['UNIX-Mode'] = File.stat(pth).mode.to_s(8)
                         res.body = File.read(pth)
                     else
                         res.status = 404
