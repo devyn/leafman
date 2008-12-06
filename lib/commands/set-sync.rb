@@ -1,4 +1,4 @@
-Leafman::Command.new "set-sync", "<project-name> on|off|<git-remote>", "choose whether <project-name> is sync-enabled or not. for Git projects you may choose a remote (defaults to origin)" do |pname, opt|
+Leafman::Command.new "set-sync", "<project-name> on|off|<git-remote>|<synkage-url>", "choose whether <project-name> is sync-enabled or not. for Git projects you may choose a remote (defaults to origin), and for other projects you must specify a Synkage base url or 'off'" do |pname, opt|
     include Leafman::Mixin
     p = Leafman::Projects.find(pname)
     warn("\e[31m\e[1mproject not found.\e[0m")||true&&next unless p
@@ -16,6 +16,10 @@ Leafman::Command.new "set-sync", "<project-name> on|off|<git-remote>", "choose w
     when 'hg', 'darcs'
         p['do_pull'] = opt =~ /^on$/i ? true : false
     else
-        warn("\e[31m\e[1mproject does not use a valid SCM.\e[0m")||true&&next
+        if opt =~ /^off$/i
+            p['synkage_url'] = nil
+        else
+            p['synkage_url'] = opt
+        end
     end
 end

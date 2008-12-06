@@ -31,7 +31,8 @@ class Synkage
     def up_to_date? what
         return false unless File.exists?(local_path_for(what))
         burl_uri = URI.parse(escape(@base_url))
-        hsh = Net::HTTP.start(burl_uri.host, burl_uri.port){|http|http.head(burl_uri.path+"/#{what}")['SHA2-Hash']}
+        hsh = nil
+        Net::HTTP.start(burl_uri.host, burl_uri.port){|http|hsh = http.head(burl_uri.path+escape("/#{what}"))['SHA2-Hash']}
         return(hsh == Digest::SHA2.file(local_path_for(what)).hexdigest)
     end
     def local_path_for what
