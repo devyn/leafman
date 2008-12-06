@@ -31,7 +31,7 @@ Leafman::Command.new "sync", "[project-names...]", "syncs all enabled projects o
             require 'lib/synkage'
             sy = Synkage.new(p['synkage_url'], p.dir)
             puts "fetching a list of all files on server..."
-            ws = sy.fetch_whats
+            ws = sy.fetch_whats - ['.leafman-project']
             puts "making the folder structure..."
             sy.expand_dir_for *ws
             wc = 0
