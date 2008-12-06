@@ -3,7 +3,7 @@
 module Leafman
     extend self
     attr :config
-    VERSION = "m3.1-web"
+    VERSION = "m4.1-clone"
 end
 $: << File.dirname(File.expand_path(__FILE__))
 require 'yaml'
