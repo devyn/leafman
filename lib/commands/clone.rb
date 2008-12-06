@@ -3,7 +3,7 @@ require 'lib/synkage'
 Leafman::Command.new "clone", "<project-name> [host[:port]]", "clones a project from the leafman web interface into your database" do |pname, *a|
     include Leafman::Mixin
     begin
-        as = a[0].split(':')
+        as = (a[0] or 'localhost').split(':')
         puts "\e[1mclone:\e[0m #{pname} \e[1mat:\e[0m #{a[0] or 'localhost'}"
         puts "\e[1mfetching project SCM\e[0m"
         case YAML.load(Net::HTTP.get("http://#{as[0]}:#{as[1] or 8585}/#{pname}.project/files/.leafman-project"))['scm']
