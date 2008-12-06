@@ -34,6 +34,7 @@ Leafman::Command.new "sync", "[project-names...]", "syncs all enabled projects o
             ws = sy.fetch_whats - ['.leafman-project']
             puts "making the folder structure..."
             sy.expand_dir_for *ws
+            puts "beginning file download..."
             wc = 0
             ws.each do |w|
                 unless sy.up_to_date?(w)

@@ -33,6 +33,7 @@ Leafman::Command.new "clone", "<project-name> [host[:port]]", "clones a project 
             ws = sy.fetch_whats
             puts "\e[1mmaking the folder structure...\e[0m"
             sy.expand_dir_for *ws
+            puts "\e[1mbeginning file download...\e[0m"
             ws.each do |w|
                 unless sy.up_to_date?(w)
                     puts "\e[1mfetching\e[0m #{w}"
