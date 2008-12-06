@@ -7,26 +7,26 @@ Leafman::Command.new "clone", "<project-name> [host[:port]]", "clones a project 
         as = (a[0] or 'localhost').split(':')
         puts "\e[1mclone:\e[0m #{pname} \e[1mat:\e[0m #{a[0] or 'localhost'}"
         puts "\e[1mfetching project SCM\e[0m"
-        case YAML.load(open("http://#{as[0]}:#{as[1] or 8585}/#{pname}.project/files/.leafman-project").read)['scm']
+        case YAML.load(open(Synkage.escape("http://#{as[0]}:#{as[1] or 8585}/#{pname}.project/files/.leafman-project")).read)['scm']
         when 'git'
             puts "\e[1mgit clone\e[0m"
-            system "git", "clone", "http://#{as[0]}:#{as[1] or 8585}/#{pname}.project/files/.git/", File.join(File.expand_path(Leafman::PROJECT_DIR), pname)
+            system "git", "clone", Synkage.escape("http://#{as[0]}:#{as[1] or 8585}/#{pname}.project/files/.git/"), File.join(File.expand_path(Leafman::PROJECT_DIR), pname)
             puts "\e[1mfetching\e[0m .leafman-project"
-            File.open(File.join(File.expand_path(Leafman::PROJECT_DIR), pname, '.leafman-project'), 'w'){|f|f.write open("http://#{as[0]}:#{as[1] or 8585}/#{pname}.project/files/.leafman-project").read}
+            File.open(File.join(File.expand_path(Leafman::PROJECT_DIR), pname, '.leafman-project'), 'w'){|f|f.write open(Synkage.escape("http://#{as[0]}:#{as[1] or 8585}/#{pname}.project/files/.leafman-project")).read}
         when 'svn'
             warn "\e[31mSorry, no Subversion support.\e[0m"
         when 'bzr'
             puts "\e[1mbzr checkout\e[0m"
-            system "bzr", "co", "http://#{as[0]}:#{as[1] or 8585}/#{pname}.project/files/", File.join(File.expand_path(Leafman::PROJECT_DIR), pname)
+            system "bzr", "co", Synkage.escape("http://#{as[0]}:#{as[1] or 8585}/#{pname}.project/files/"), File.join(File.expand_path(Leafman::PROJECT_DIR), pname)
             puts "\e[1mfetching\e[0m .leafman-project"
-            File.open(File.join(File.expand_path(Leafman::PROJECT_DIR), pname, '.leafman-project'), 'w'){|f|f.write open("http://#{as[0]}:#{as[1] or 8585}/#{pname}.project/files/.leafman-project").read}
+            File.open(File.join(File.expand_path(Leafman::PROJECT_DIR), pname, '.leafman-project'), 'w'){|f|f.write open(Synkage.escape("http://#{as[0]}:#{as[1] or 8585}/#{pname}.project/files/.leafman-project")).read}
         when 'hg'
             warn "\e[31mSorry, no Mercurial support. (yet!)\e[0m"
         when 'darcs'
             puts "\e[1mdarcs get --lazy\e[0m"
-            system "darcs", "get", "--lazy", "http://#{as[0]}:#{as[1] or 8585}/#{pname}.project/files/.git/", File.join(File.expand_path(Leafman::PROJECT_DIR), pname)
+            system "darcs", "get", "--lazy", Synkage.escape("http://#{as[0]}:#{as[1] or 8585}/#{pname}.project/files/.git/"), File.join(File.expand_path(Leafman::PROJECT_DIR), pname)
             puts "\e[1mfetching\e[0m .leafman-project"
-            File.open(File.join(File.expand_path(Leafman::PROJECT_DIR), pname, '.leafman-project'), 'w'){|f|f.write open("http://#{as[0]}:#{as[1] or 8585}/#{pname}.project/files/.leafman-project").read}
+            File.open(File.join(File.expand_path(Leafman::PROJECT_DIR), pname, '.leafman-project'), 'w'){|f|f.write open(Synkage.escape("http://#{as[0]}:#{as[1] or 8585}/#{pname}.project/files/.leafman-project")).read}
         else
             sy = Synkage.new("http://#{as[0]}:#{as[1] or 8585}/#{pname}.project/files/", File.join(File.expand_path(Leafman::PROJECT_DIR), pname))
             puts "\e[1mfetching a list of all files on server...\e[0m"

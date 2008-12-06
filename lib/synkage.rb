@@ -40,10 +40,10 @@ class Synkage
     def remote_path_for what
         "#{@base_url}/#{what}"
     end
-    def escape(url)
+    def self.escape(url)
         url.gsub(/[^A-Za-z0-9:\/.-_]/){|input|"%"+input[0].to_s(16)}
     end
-    def unescape(url)
+    def self.unescape(url)
         url.gsub(/\%([A-Fa-f0-9]{1,2})/){$1.to_i(16).chr}
     end
     def expand_dir_for *whats
