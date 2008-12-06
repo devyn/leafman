@@ -46,6 +46,12 @@ class Synkage
     def self.unescape(url)
         url.gsub(/\%([A-Fa-f0-9]{1,2})/){$1.to_i(16).chr}
     end
+    def escape(url)
+        Synkage.escape url
+    end
+    def unescape(url)
+        Synkage.unescape url
+    end
     def expand_dir_for *whats
         whats.each {|what| FileUtils.mkdir_p(File.dirname(local_path_for(what))) }
     end
