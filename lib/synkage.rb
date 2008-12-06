@@ -63,7 +63,7 @@ class Synkage
         f = File.open(local_path_for(what), 'w')
         Net::HTTP.start uri.host, uri.port do |http|
             http.request_get uri.path do |res|
-                f.chmod res['UNIX-Mode'].to_i(8)
+                f.chmod res['UNIX-Mode'].to_i(8) if res['UNIX-Mode']
                 res.read_body {|seg| f.write seg}
             end
         end
