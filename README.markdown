@@ -2,6 +2,10 @@ Leafman
 ===============
 Leafman is a project manager, particularly useful if you are a freelance hacker like me. After all, I originally developed this just for myself, but then pushed it to Github for everyone to enjoy.
 
+Licensing
+-----------------------
+All parts of Leafman are licensed under the Creative Commons Attribution Share-alike 3.0 (at <http://creativecommons.org/licenses/by-sa/3.0/>).
+
 Repository Support
 -----------------------
 * Git (green)

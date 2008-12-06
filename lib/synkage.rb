@@ -1,5 +1,5 @@
 # Synkage, the ability to synchronize over plain HTML+HTTP.
-# Once done, this will be part of Leafman.
+# Currently part of Leafman, but you are free to adapt this to your own use.
 require 'rubygems' rescue nil # it doesn't matter if they don't have RubyGems installed, it just makes it easier.
 require 'uri'
 require 'net/http'
