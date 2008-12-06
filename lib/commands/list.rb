@@ -27,6 +27,8 @@ Leafman::Command.new "list", "", "list of all projects" do
                 fetchable = p['do_pull']
             when 'darcs'
                 fetchable = p['do_pull']
+            else
+                fetchable = p['synkage_url']
         end
         pushable = p['do_push']
         eestr = nil

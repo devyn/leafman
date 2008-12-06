@@ -20,7 +20,7 @@ Leafman::Command.new "show", "<project-name>", "show everything known about the 
         puts "...\tuses \e[35m\e[1mDarcs\e[0m#{", pushes" if p['do_push']}#{", syncs" if p['do_pull']}."
         # HELP! I need Darcs revision detecting code!
     else
-        puts "...\tdoesn't have \e[1mversion control\e[0m."
+        puts "...\tdoesn't have \e[1mversion control\e[0m#{", syncs" if p['synkage_url']}."
     end
     puts "...\tis a \e[1m#{p['type'].capitalize}\e[0m project." if p['type']
     p['bugs'].each_with_index do |b, i|
