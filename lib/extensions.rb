@@ -4,12 +4,14 @@ module Leafman
         attr :name
         attr :help_args
         attr :help_comment
+        attr :kind
         attr :block
-        def initialize(_name, _help_args, _help_comment, &_block)
-            @name = _name
-            @help_args = _help_args
+        def initialize(_name, _help_args, _help_comment, _kind='general', &_block)
+            @name         = _name
+            @help_args    = _help_args
             @help_comment = _help_comment
-            @block = _block
+            @kind         = _kind
+            @block        = _block
             Leafman::COMMANDS << self
         end
     end

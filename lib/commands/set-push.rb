@@ -1,4 +1,4 @@
-Leafman::Command.new "set-push", "<project-name> on|off", "choose whether <project-name> is push-enabled or not" do |pname, opt|
+Leafman::Command.new "set-push", "<project-name> on|off", "choose whether <project-name> is push-enabled or not", "configuration" do |pname, opt|
     include Leafman::Mixin
     p = Leafman::Projects.find(pname)
     warn("\e[31m\e[1mproject not found.\e[0m")||true&&next unless p
