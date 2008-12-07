@@ -1,3 +1,4 @@
+require 'lib/synkage'
 Leafman::Command.new "sync", "[project-names...]", "syncs all enabled projects or [project-names...] with the server" do |*pnames|
     include Leafman::Mixin
     Leafman::Projects.each(*pnames) do |p|
@@ -28,7 +29,6 @@ Leafman::Command.new "sync", "[project-names...]", "syncs all enabled projects o
             end
         elsif p['synkage_url']
             puts "\e[1msync:\e[0m #{p['name']}\e[0m"
-            require 'lib/synkage'
             sy = Synkage.new(p['synkage_url'], p.dir)
             puts "fetching a list of all files on server..."
             ws = sy.fetch_whats - ['.leafman-project']
