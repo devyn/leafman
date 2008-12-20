@@ -25,7 +25,7 @@ Leafman::Command.new "sync", "[project-names...]", "syncs all enabled projects o
         elsif (p['scm'] == 'darcs') and p['do_pull']
             puts "\e[1msync:\e[0m \e[35m#{p['name']}\e[0m"
             Dir.chdir(p.dir) do
-                system("darcs", "pull") or warn("\e[31m\e[1mcould not pull for\e[0m \e[35m#{p['name']}\e[0m")
+                system("darcs", "pull", '-a') or warn("\e[31m\e[1mcould not pull for\e[0m \e[35m#{p['name']}\e[0m")
             end
         elsif p['synkage_url']
             puts "\e[1msync:\e[0m #{p['name']}\e[0m"
