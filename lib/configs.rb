@@ -31,9 +31,9 @@ module Leafman
         exit 1
     end
     def load_conf
-        @config = YAML.load(File.read(File.join(File.expand_path(PROJECT_DIR), ".leafman")))
+        @config = YAML.load(File.read(File.join(File.expand_path(PROJECT_DIR), ".leafman", "_config")))
     end
     def save_conf
-        File.open(File.join(File.expand_path(PROJECT_DIR), ".leafman"), "w") {|f| f.write YAML.dump(@config)}
+        File.open(File.join(File.expand_path(PROJECT_DIR), ".leafman", "_config"), "w") {|f| f.write YAML.dump(@config)}
     end
 end
