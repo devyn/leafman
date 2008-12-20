@@ -49,7 +49,7 @@ You can now view the files of a project on the web interface, if web_show_files 
     $ bzr co http://localhost:8585/<project>.project/files/ <where-to-checkout-to> # using bazaar
     $ darcs get --lazy http://localhost:8585/<project>.project/files/ <where-to-get-to> # using darcs
     
-Mercurial is not working because static-http support is broken, and will not be supported until it is fixed.
+Mercurial is not working because we don't support range requests yet, which static-http on Mercurial needs.
 
 **New!** Easy cloning:
 
