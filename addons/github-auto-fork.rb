@@ -20,8 +20,8 @@ Leafman::Command.new 'github-auto-fork', '<user>/<repo>', 'automatic github repo
   login_form.submit
   puts "\e[1mforking repo\e[0m"
   agent.get "/#{user_and_repo}/fork"
-  puts "waiting 30 seconds to be sure that repo is forked..."
-  sleep 30
+  puts "waiting 10 seconds to be sure that repo is forked..."
+  sleep 10
   puts "\e[1mcloning fork\e[0m"
   system 'git', 'clone', "git@github.com:#{me}/#{user_and_repo.split('/').last}.git", File.join(File.expand_path(Leafman::PROJECT_DIR), user_and_repo.split('/').last)
   Dir.chdir(File.join(File.expand_path(Leafman::PROJECT_DIR), user_and_repo.split('/').last)) { system 'git', 'remote', 'add', 'forked_from', "git://github.com/#{user_and_repo}.git" }
