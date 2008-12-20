@@ -5,7 +5,7 @@ Leafman::Command.new "sync", "[project-names...]", "syncs all enabled projects o
         if (p['scm'] == 'git') and p['fetch']
             puts "\e[1msync:\e[0m \e[32m#{p['name']}\e[0m"
             Dir.chdir(p.dir) do
-                system("git", "fetch", p['fetch']) or warn("\e[31m\e[1mcould not pull for\e[0m \e[32m#{p['name']}\e[0m")
+                system("git", "pull", p['fetch'], "master") or warn("\e[31m\e[1mcould not pull for\e[0m \e[32m#{p['name']}\e[0m")
             end
         elsif (p['scm'] == 'svn') and p['do_update']
             puts "\e[1msync:\e[0m \e[34m#{p['name']}\e[0m"
@@ -20,7 +20,7 @@ Leafman::Command.new "sync", "[project-names...]", "syncs all enabled projects o
         elsif (p['scm'] == 'hg') and p['do_pull']
             puts "\e[1msync:\e[0m \e[36m#{p['name']}\e[0m"
             Dir.chdir(p.dir) do
-                system("hg", "pull") or warn("\e[31m\e[1mcould not pull for\e[0m \e[36m#{p['name']}\e[0m")
+                system("hg", "pull") and system("hg", "update") or warn("\e[31m\e[1mcould not pull for\e[0m \e[36m#{p['name']}\e[0m")
             end
         elsif (p['scm'] == 'darcs') and p['do_pull']
             puts "\e[1msync:\e[0m \e[35m#{p['name']}\e[0m"
