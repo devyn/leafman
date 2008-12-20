@@ -1,4 +1,4 @@
-Leafman::Command.new "skel-rails", "<project-name> [rails-options...]", "# run 'rails' on the <project-name>'s dir with [rails-options...]" do |pname, *rails_opts|
+Leafman::Command.new "skel-rails", "<project-name> [rails-options...]", "run 'rails' on the <project-name>'s dir with [rails-options...]" do |pname, *rails_opts|
     include Leafman::Mixin
     puts "\e[1mskel-rails:\e[0m #{pname}"
     p = Leafman::Projects.find(pname)
