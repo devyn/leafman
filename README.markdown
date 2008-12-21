@@ -43,7 +43,7 @@ Also, to note: most colors on the web interface are the same as they are on the 
 
 Web Files
 ------------------
-You can now view the files of a project on the web interface, if web_show_files is on. This also allows pulling for Git, Bazaar, and Darcs, but does not allow pulling for Subversion or Mercurial.
+You can now view the files of a project on the web interface, if web\_show\_files is on. This also allows pulling for Git, Bazaar, and Darcs, but does not allow pulling for Subversion or Mercurial.
 
     $ git clone http://localhost:8585/<project>.project/files/.git/ <where-to-clone-to> # using git
     $ bzr co http://localhost:8585/<project>.project/files/ <where-to-checkout-to> # using bazaar
