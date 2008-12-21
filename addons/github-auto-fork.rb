@@ -2,6 +2,11 @@
 # GitHub auto fork for Leafman, using WWW::Mechanize, and HighLine for asking questions and stuff.
 require 'mechanize'
 require 'highline/import'
+class << $stdin
+  def eof?
+    false
+  end
+end
 Leafman::Command.new 'github-auto-fork', '<user>/<repo>', 'automatic github repo forking', 'official addons' do |user_and_repo|
   include Leafman::Mixin
   puts "\e[1mgithub-auto-fork\e[0m"
