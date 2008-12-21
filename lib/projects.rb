@@ -33,9 +33,14 @@ module Leafman
             end
         end
         def find pname
+            pname = current if pname == "@@"
             return nil unless pname.is_a? String
             return nil unless File.exists?(File.join(File.expand_path(PROJECT_DIR), '.leafman', "#{pname}.yml"))
             return Accessor.new(pname)
+        end
+        def current
+            return nil unless pr = Dir.pwd.scan(/^#{Regexp.escape(File.expand_path(Leafman::PROJECT_DIR))}\/([^\/]+)/).flatten.first
+            pr
         end
         def add pname, phash
             File.open(File.join(File.expand_path(PROJECT_DIR), '.leafman', "#{pname}.yml"), 'w') do |f|
