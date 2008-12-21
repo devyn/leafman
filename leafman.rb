@@ -3,7 +3,7 @@
 module Leafman
     extend self
     attr :config
-    VERSION = "m4.1-clone"
+    VERSION = "m4.2"
 end
 $: << File.dirname(File.expand_path(__FILE__))
 require 'yaml'
@@ -17,7 +17,7 @@ Dir.glob(File.join(File.dirname(File.expand_path(__FILE__)), 'lib', 'commands', 
     load cf
 end
 load '.leafman-rc' if File.exists?('.leafman-rc')
-load File.join(File.expand_path(Leafman::PROJECT_DIR), ".leafman-rc") if File.exists?(File.join(File.expand_path(Leafman::PROJECT_DIR), ".leafman-rc"))
+load File.join(File.expand_path(Leafman::PROJECT_DIR), ".leafman", "_commands") if File.exists?(File.join(File.expand_path(Leafman::PROJECT_DIR), ".leafman", "_commands"))
 if __FILE__ == $0
     Leafman.parse_args *ARGV
 end
