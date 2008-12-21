@@ -1,7 +1,6 @@
 ### ADD-ON (github-auto-fork) BEGIN ###
-# GitHub auto fork for Leafman, using WWW::Mechanize, and HighLine for asking questions and stuff.
+# GitHub auto fork for Leafman, using WWW::Mechanize
 require 'mechanize'
-require 'highline/import'
 Leafman::Command.new 'github-auto-fork', '<user>/<repo>', 'automatic github repo forking', 'official addons' do |user_and_repo|
   include Leafman::Mixin
   puts "\e[1mgithub-auto-fork\e[0m"
@@ -13,14 +12,16 @@ Leafman::Command.new 'github-auto-fork', '<user>/<repo>', 'automatic github repo
   login_page = main_page.links.select{|l|l.text=~/^login$/i}.first.click
   login_form = login_page.forms.first
   puts "Don't worry, this information doesn't go anywhere."
-  me = ask('Your GitHub username? '); login_form['login'] = me
-  login_form['password'] = ask('Your GitHub password? ') {|q| q.echo = '*' }
+  print "Your GitHub username? "
+  me = $stdin.readline.chomp; login_form['login'] = me
+  print "Your GitHub password? "
+  login_form['password'] = $stdin.readline.chomp
   puts "\e[1mlogging in...\e[0m"
   login_form.submit
   puts "\e[1mforking repo\e[0m"
   agent.get "/#{user_and_repo}/fork"
-  puts "waiting 15 seconds to be sure that repo is forked..."
-  sleep 15
+  puts "waiting 10 seconds to be sure that repo is forked..."
+  sleep 10
   puts "\e[1mcloning fork\e[0m"
   system 'git', 'clone', "git@github.com:#{me}/#{user_and_repo.split('/').last}.git", File.join(File.expand_path(Leafman::PROJECT_DIR), user_and_repo.split('/').last)
   Dir.chdir(File.join(File.expand_path(Leafman::PROJECT_DIR), user_and_repo.split('/').last)) { system 'git', 'remote', 'add', 'forked_from', "git://github.com/#{user_and_repo}.git" }
