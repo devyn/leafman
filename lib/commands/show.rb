@@ -3,6 +3,11 @@ Leafman::Command.new "show", "<project-name>", "show everything known about the 
     p = Leafman::Projects.find(pname)
     warn("\e[31m\e[1mproject not found.\e[0m")||true&&next unless p
     puts "\e[1m#{p['name']}\e[0m"
+    if d = p['description']
+        print "\e[33m"
+        puts d.split("\n").collect{|l|"   \t#{l}"}.join("\n")
+        puts "\e[0m"
+    end
     case p['scm']
     when 'git'
         puts "...\tuses \e[32m\e[1mGit\e[0m#{", pushes" if p['do_push']}#{", syncs with \e[36m#{p['fetch']}\e[0m" if p['fetch']}."

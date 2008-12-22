@@ -6,22 +6,23 @@ module Leafman
 body {
     font-family: sans-serif;
 }
-.scm-git, a.scm-git:visited     { color:            #009900; }
-.scm-svn, a.scm-svn:visited     { color:            #000099; }
-.scm-bzr, a.scm-bzr:visited     { color:            #999900; }
-.scm-hg, a.scm-hg:visited       { color:            #009999; }
-.scm-darcs, a.scm-darcs:visited { color:            #990099; }
-.scm-none, a.scm-none:visited   { color:            #000000; }
-.bug                            { color:            #660000; }
-.task                           { color:            #666600; }
+.scm-git, a.scm-git:visited     { color:            #009900;    }
+.scm-svn, a.scm-svn:visited     { color:            #000099;    }
+.scm-bzr, a.scm-bzr:visited     { color:            #999900;    }
+.scm-hg, a.scm-hg:visited       { color:            #009999;    }
+.scm-darcs, a.scm-darcs:visited { color:            #990099;    }
+.scm-none, a.scm-none:visited   { color:            #000000;    }
+.bug                            { color:            #660000;    }
+.task                           { color:            #666600;    }
 h1                              { background-color: #999999;
                                   color:            #FFFFFF;
-                                  padding-left:     15px;    }
-a, a:visited                    { color:            #000000; }
-.current-rev                    { color:            #996600; }
-a.pdir,   a.pdir:visited        { color:            #660033; }
-a.dir,     a.dir:visited        { color:            #006633; }
-a.file,   a.file:visited        { color:            #663300; }
+                                  padding-left:     15px;       }
+a, a:visited                    { color:            #000000;    }
+.current-rev                    { color:            #996600;    }
+a.pdir,   a.pdir:visited        { color:            #660033;    }
+a.dir,     a.dir:visited        { color:            #006633;    }
+a.file,   a.file:visited        { color:            #663300;    }
+.description                    { color:            #442200;    }
 EOF
         def do_GET(*args)
             self.class.class_eval { remove_const :STYLESHEET if defined?(STYLESHEET) }
@@ -169,7 +170,8 @@ EOF
         <a href="/#{$1}.project/files/">file directory</a>
     </div>
     <h2>#{CGI.escapeHTML($1)}</h2>
-    <div>
+    #{"<p class='description'>#{p['description'].gsub("&", "&amp;").gsub("<", "&lt;").gsub(">", "&gt;").gsub("\n", "<br/>")}</div>" if p['description']}
+    <p>
         #{"... uses <strong class='scm-git'>Git</strong>#{", pushes" if p['do_push']}#{", syncs with <strong>#{CGI.escapeHTML(p['fetch'])}</strong>" if p['fetch']}." if p['scm'] == 'git'}
         #{"... uses <strong class='scm-svn'>Subversion</strong>#{", pushes" if p['do_push']}#{", syncs" if p['do_update']}." if p['scm'] == 'svn'}
         #{"... uses <strong class='scm-bzr'>Bazaar</strong>#{", pushes" if p['do_push']}#{", syncs" if p['do_update']}." if p['scm'] == 'bzr'}
