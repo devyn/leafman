@@ -55,3 +55,14 @@ Mercurial is not working because we don't support range requests yet, which stat
 
     $ ruby leafman.rb clone <project-name> [host[:port]] # waaay easier
 
+Descriptions
+------------------
+Now you may add a description to a project, which is shown on "show" and the web interface.
+
+    $ ruby leafman.rb add-description <project-name> # Then type in description and EOF (Ctrl-D on Unix/Mac, Ctrl-Z on Windows)
+
+Tips and Tricks
+-------------------
+1. In place of a project name, most commands support '@@', which means the project that the working directory belongs to.
+
+More coming soon!
