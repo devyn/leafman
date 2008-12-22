@@ -63,6 +63,6 @@ Now you may add a description to a project, which is shown on "show" and the web
 
 Tips and Tricks
 -------------------
-1. In place of a project name, most commands support '@@', which means the project that the working directory belongs to.
+* In place of a project name, most commands support '@@', which means the project that the working directory belongs to.
 
 More coming soon!
