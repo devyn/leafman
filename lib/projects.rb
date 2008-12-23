@@ -10,10 +10,13 @@ module Leafman
             end
             def [](k)
                 return @pname if k == 'name'
-                YAML.load(File.read(conf_file_path))[k]
+                ro_hash[k]
+            end
+            def ro_hash
+                YAML.load(File.read(conf_file_path))
             end
             def []=(k,v)
-                y = YAML.load(File.read(conf_file_path))
+                y = ro_hash
                 r = y[k]=v
                 File.open(conf_file_path, 'w') do |f|
                     f.write YAML.dump(y)
@@ -46,6 +49,7 @@ module Leafman
             File.open(File.join(File.expand_path(PROJECT_DIR), '.leafman', "#{pname}.yml"), 'w') do |f|
                 f.write YAML.dump(phash)
             end
+            find pname
         end
         def each(*ns)
             ns = names if ns.empty?

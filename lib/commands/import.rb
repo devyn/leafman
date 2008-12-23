@@ -2,15 +2,10 @@ Leafman::Command.new "import", "<directory>", "import <directory> as a project, 
     include Leafman::Mixin
     puts "\e[1mimport:\e[0m #{File.basename(dir)}"
     FileUtils.cp_r File.expand_path(dir), File.join(File.expand_path(Leafman::PROJECT_DIR), File.basename(dir)), :verbose => true
-    print "\e[1mauto-detect SCM:\e[0m "
-    scm = nil
-    scm = 'git' if File.directory?(File.join(File.expand_path(Leafman::PROJECT_DIR), File.basename(dir), ".git"))
-    scm = 'svn' if File.directory?(File.join(File.expand_path(Leafman::PROJECT_DIR), File.basename(dir), ".svn"))
-    scm = 'bzr' if File.directory?(File.join(File.expand_path(Leafman::PROJECT_DIR), File.basename(dir), ".bzr"))
-    scm = 'hg' if File.directory?(File.join(File.expand_path(Leafman::PROJECT_DIR), File.basename(dir), ".hg"))
-    scm = 'darcs' if File.directory?(File.join(File.expand_path(Leafman::PROJECT_DIR), File.basename(dir), "_darcs"))
-    puts((scm or 'none').upcase)
-    puts "\e[1mcreate project config\e[0m"
-    Leafman::Projects.add(File.basename(dir), 'type' => nil, 'scm' => scm)
+    puts "\e[1mcreating project config\e[0m"
+    p = Leafman::Projects.add(File.basename(dir), 'type' => nil, 'scm' => nil)
+    puts "\e[1mauto-detecting project info\e[0m"
+    p.detect
+    puts *p.ro_hash.map{|k,v|"#{k}: #{v.inspect}"}
     puts "\e[32m\e[1mdone!\e[0m"
 end

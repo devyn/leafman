@@ -13,6 +13,7 @@ require 'lib/extensions'
 require 'lib/projects'
 require 'lib/configs'
 require 'lib/servlet'
+require 'lib/detection'
 Dir.glob(File.join(File.dirname(File.expand_path(__FILE__)), 'lib', 'commands', '*.rb')).sort.each do |cf|
     load cf
 end
