@@ -4,7 +4,7 @@ Leafman::Command.new "skel-rails", "<project-name> [rails-options...]", "run 'ra
     p = Leafman::Projects.find(pname)
     warn("\e[31m\e[1mproject not found.\e[0m")||true&&next unless p
     puts "\e[1mrun \e[0m'rails'\e[1m on project dir\e[0m"
-    Dir.chdir(File.join(File.expand_path(Leafman::PROJECT_DIR), pname)) do
+    Dir.chdir(p.dir) do
         run = ["rails"]
         run += rails_opts
         run << "."
