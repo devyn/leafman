@@ -19,7 +19,7 @@ module Leafman
       other = 0
       
       goproc = proc do |d|
-        Dir.entries(d) do |e|
+        (Dir.entries(d) - %w(. .. .git .svn .bzr .hg _darcs)).each do |e|
           if File.file?(File.join(d, e))
             case e.split('.').last.downcase
               when 'erb'
