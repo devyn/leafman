@@ -3,7 +3,7 @@
 module Leafman
     extend self
     attr :config
-    VERSION = "vuhu"
+    VERSION = "vuhu m2"
 end
 $: << File.dirname(File.expand_path(__FILE__))
 require 'yaml'
