@@ -4,4 +4,5 @@ Leafman::Command.new "redetect", "[project-names...]", "redetect information abo
     puts "processing #{p['name']}."
     p.detect
   end
+  puts "\e[1m\e[32mdone!\e[0m"
 end
