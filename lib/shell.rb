@@ -33,7 +33,7 @@ module Leafman
       end if @current_project
       Leafman.print "#{cp_color_code}#{@current_project ? @current_project['name'] : nil}\e[0m \e[1m>>\e[0m "
       line = Readline.readline
-      return if line == nil
+      return if !line or line.empty?
       Readline::HISTORY.push line
       ss = autosplit line
       case ss[0]
