@@ -42,7 +42,11 @@ module Leafman
       when 'exit', 'quit'
         stop
       else
-        Dir.chdir(@current_project.dir) { Leafman.parse_args *ss }
+        if @current_project
+          Dir.chdir(@current_project.dir) { Leafman.parse_args *ss }
+        else
+          Dir.chdir(Leafman::PROJECT_DIR) { Leafman.parse_args *ss }
+        end
       end
     end
     def autosplit input
