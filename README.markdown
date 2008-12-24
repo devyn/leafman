@@ -67,4 +67,16 @@ Tips and Tricks
 -------------------
 * In place of a project name, most commands support '@@', which means the project that the working directory belongs to.
 
-More coming soon!
+More coming soon
+
+Shell
+-------------------
+Vuhu milestone 3 adds an interactive shell to Leafman. This is useful when running many commands together. To start:
+
+    $ ruby leafman.rb shell
+    >> chproj (project name)
+    (project name) >> show @@
+    (project name)
+    ... uses (...).
+
+etc.

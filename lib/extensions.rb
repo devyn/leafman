@@ -23,7 +23,7 @@ module Leafman
         load_conf rescue warn("\e[33mcouldn't load the config file; ignore this if you are running INIT\e[0m")
         c = get_command(argv.shift)
         return warn("\e[31m\e[1minvalid command\e[0m") unless c
-        c.block.call(*argv)
+        c.block.call(*argv) rescue puts("\e[1m\e[31mERROR: \e[0m\e[31m#{$!.message}\e[0m")
         save_conf
     end
 end
