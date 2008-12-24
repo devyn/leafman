@@ -1,0 +1,81 @@
+# Leafman Interactive Shell
+require 'readline'
+module Leafman
+  class Shell
+    def initialize
+      @current_project = Leafman::Projects.find '@@'
+      @running = false
+    end
+    def running?
+      @running
+    end
+    def start
+      @running = true
+      # other start code...
+    end
+    def stop
+      @running = false
+      # other stop  code...
+    end
+    def run_input
+      cp_color_code = ""
+      case @current_project['scm']
+      when 'git'
+        cp_color_code = "\e[32m"
+      when 'svn'
+        cp_color_code = "\e[34m"
+      when 'bzr'
+        cp_color_code = "\e[33m"
+      when 'hg'
+        cp_color_code = "\e[36m"
+      when 'darcs'
+        cp_color_code = "\e[35m"
+      end if @current_project
+      Leafman.print "#{cp_color_code}#{@current_project ? @current_project['name'] : nil}\e[0m \e[1m>>\e[0m "
+      line = Readline.readline
+      Readline::HISTORY.push line
+      ss = autosplit line
+      case ss[0]
+      when 'chproj'
+        @current_project = Leafman::Projects.find ss[1]
+      when 'exit', 'quit'
+        stop
+      else
+        Dir.chdir(@current_project.dir) { Leafman.parse_args *ss }
+      end
+    end
+    def autosplit input
+      fst = input.split(" ")
+      snd = []
+      trd = []
+      inr = false
+      fst.each do |pt|
+        if pt =~ /^"/
+          snd << pt.sub(/^"/, '')
+          inr = true
+        elsif (pt =~ /"$/) and inr
+          snd[-1] << " #{pt.sub(/"$/, '')}"
+          inr = false
+        elsif inr
+          snd[-1] << " #{pt}"
+        else
+          snd << pt
+        end
+      end
+      snd.each do |pt|
+        if pt =~ /^'/
+          trd << pt.sub(/^'/, '')
+          inr = true
+        elsif (pt =~ /'$/) and inr
+          trd[-1] << " #{pt.sub(/'$/, '')}"
+          inr = false
+        elsif inr
+          trd[-1] << " #{pt}"
+        else
+          trd << pt
+        end
+      end
+      trd
+    end
+  end
+end
