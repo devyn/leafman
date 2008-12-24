@@ -35,17 +35,19 @@ module Leafman
       line = Readline.readline
       return if !line or line.empty?
       Readline::HISTORY.push line
-      ss = autosplit line
-      case ss[0]
-      when 'chproj'
-        @current_project = Leafman::Projects.find ss[1]
-      when 'exit', 'quit'
-        stop
-      else
-        if @current_project
-          Dir.chdir(@current_project.dir) { Leafman.parse_args *ss }
+      sso = autosplit line
+      sso.each do |ss|
+        case ss[0]
+        when 'chproj'
+          @current_project = Leafman::Projects.find ss[1]
+        when 'exit', 'quit'
+          stop
         else
-          Dir.chdir(Leafman::PROJECT_DIR) { Leafman.parse_args *ss }
+          if @current_project
+            Dir.chdir(@current_project.dir) { Leafman.parse_args *ss }
+          else
+            Dir.chdir(Leafman::PROJECT_DIR) { Leafman.parse_args *ss }
+          end
         end
       end
     end
@@ -53,6 +55,7 @@ module Leafman
       fst = input.split(" ")
       snd = []
       trd = []
+      qad = [[]]
       inr = false
       fst.each do |pt|
         if pt =~ /^"[^ "]*"$/
@@ -84,7 +87,14 @@ module Leafman
           trd << pt
         end
       end
-      trd
+      trd.each do |pt|
+        if pt == "&"
+          qad << []
+        else
+          qad[-1] << pt
+        end
+      end
+      qad
     end
   end
 end
