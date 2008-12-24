@@ -46,7 +46,7 @@ module Leafman
           if @current_project
             Dir.chdir(@current_project.dir) { Leafman.parse_args *ss }
           else
-            Dir.chdir(Leafman::PROJECT_DIR) { Leafman.parse_args *ss }
+            Dir.chdir(File.expand_path(Leafman::PROJECT_DIR)) { Leafman.parse_args *ss }
           end
         end
       end
