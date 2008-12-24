@@ -2,6 +2,7 @@ module Leafman
   class Projects::Accessor
     def detect
       # detect SCM
+      self['scm'] =  nil
       self['scm'] = 'git'   if File.directory?(dir('.git'  ))
       self['scm'] = 'svn'   if File.directory?(dir('.svn'  ))
       self['scm'] = 'bzr'   if File.directory?(dir('.bzr'  ))
