@@ -1,4 +1,4 @@
-Leafman::Command.new "set-description", "<project-name>", "set the description for <project-name>" do |pname|
+Leafman::Command.new "set-description", "<project-name>", "set the description for <project-name>", "configuration" do |pname|
     include Leafman::Mixin
     p = Leafman::Projects.find pname
     warn("\e[31m\e[1mproject not found.\e[0m")||true&&next unless p
