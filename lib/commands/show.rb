@@ -29,7 +29,7 @@ Leafman::Command.new "show", "<project-name>", "show everything known about the 
     end
     puts "...\tis a \e[1m#{p['type'].capitalize}\e[0m project." if p['type']
     p['bugs'].each_with_index do |b, i|
-        puts "...\t\e[1m\e[31mbug (\e[36mb#{i}\e[31m):\e[0m #{b}"
+        puts "...\t\e[1m\e[31mbug  (\e[36mb#{i}\e[31m):\e[0m #{b}"
     end if p['bugs']
     p['todos'].each_with_index do |t, i|
         puts "...\t\e[1m\e[33mtask (\e[36mt#{i}\e[33m):\e[0m #{t}"
