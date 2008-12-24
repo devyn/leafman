@@ -51,7 +51,9 @@ module Leafman
       trd = []
       inr = false
       fst.each do |pt|
-        if pt =~ /^"/
+        if pt =~ /^"[^ "]*"$/
+          snd << pt.sub(/^"/, '').sub(/"$/, '')
+        elsif pt =~ /^"/
           snd << pt.sub(/^"/, '')
           inr = true
         elsif (pt =~ /"$/) and inr
@@ -64,7 +66,9 @@ module Leafman
         end
       end
       snd.each do |pt|
-        if pt =~ /^'/
+        if pt =~ /^'[^ ']*'$/
+          snd << pt.sub(/^'/, '').sub(/'$/, '')
+        elsif pt =~ /^'/
           trd << pt.sub(/^'/, '')
           inr = true
         elsif (pt =~ /'$/) and inr
