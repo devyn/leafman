@@ -1,2 +1,5 @@
 [1mgithub-auto-fork[0m <user>/<repo>
     automatic github repo forking
+
+GitHub-Auto-Fork is an add-on that can automatically fork GitHub projects and add them to your Leafman database.
+First, it logs you in to GitHub. Don't fret about entering your password, the only place it goes is GitHub. After that, it goes to the project page and "clicks" on "fork". Then, it waits for the forking to be completed and clones it. It then adds it to your database.
