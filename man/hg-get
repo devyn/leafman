@@ -1,0 +1,2 @@
+[1mhg-get[0m <project-name> <hg-url>
+    clone the Mercurial project called <project-name> at <hg-url>

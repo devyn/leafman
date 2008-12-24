@@ -1,0 +1,2 @@
+[1msync[0m [project-names...]
+    syncs all enabled projects or [project-names...] with the server

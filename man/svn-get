@@ -1,0 +1,2 @@
+[1msvn-get[0m <project-name> <svn-url>
+    checkout the Subversion project called <project-name> at <svn-url>

@@ -1,0 +1,2 @@
+[1mclone[0m <project-name> [host[:port]]
+    clones a project from the leafman web interface into your database

@@ -1,0 +1,2 @@
+[1mbzr-get[0m <project-name> <bzr-url>
+    checkout the Bazaar project called <project-name> at <bzr-url>

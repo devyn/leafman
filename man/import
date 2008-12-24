@@ -1,0 +1,2 @@
+[1mimport[0m <directory>
+    import <directory> as a project, then auto-detect it's SCM

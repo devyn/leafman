@@ -1,0 +1,2 @@
+[1mgit-fork[0m <project-name> <git-url>
+    fork the Git project called <project-name> at <git-url>

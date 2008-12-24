@@ -1,0 +1,2 @@
+[1mpush[0m [project-names...]
+    pushes all distributed enabled projects or [project-names...] to the server

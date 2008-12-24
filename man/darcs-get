@@ -1,0 +1,2 @@
+[1mdarcs-get[0m <project-name> <hg-url>
+    get the Darcs project called <project-name> at <darcs-url>

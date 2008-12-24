@@ -1,0 +1,2 @@
+[1mgit-get[0m <project-name> <git-url>
+    clone the Git project called <project-name> at <git-url>

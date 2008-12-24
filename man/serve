@@ -1,0 +1,2 @@
+[1mserve[0m [port]
+    set up an HTTPServer for all projects (optionally, on [port] or 8585)

@@ -1,0 +1,2 @@
+[1mcomplete-task[0m <project-name> <number>
+    complete a task on <project-name> with <number> (ex. t0, t1, t2...)

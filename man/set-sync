@@ -1,0 +1,2 @@
+[1mset-sync[0m <project-name> on|off|<git-remote>|<synkage-url>
+    choose whether <project-name> is sync-enabled or not. for Git projects you may choose a remote (defaults to origin), and for other projects you must specify a Synkage base url or 'off'
