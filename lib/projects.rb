@@ -54,7 +54,8 @@ module Leafman
         def each(*ns)
             ns = names if ns.empty?
             ns.sort.each do |pname|
-                yield Accessor.new(pname) if File.exists?(File.join(File.expand_path(PROJECT_DIR), '.leafman', "#{pname}.yml"))
+                p = find pname
+                yield p if p
             end
         end
         def names
