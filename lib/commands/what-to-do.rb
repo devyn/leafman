@@ -4,19 +4,7 @@ Leafman::Command.new "what-to-do", "", "answer the age-old question 'What should
     hghst = 0
     Leafman::Projects.each{|p| hghst = p['name'].size if (p['name'].size > hghst) and (p['todos'] or p['bugs']) }
     Leafman::Projects.each do |p|
-        scm_code = ''
-        case p['scm']
-            when 'git'
-                scm_code = "\e[32m"
-            when 'svn'
-                scm_code = "\e[34m"
-            when 'bzr'
-                scm_code = "\e[33m"
-            when 'hg'
-                scm_code = "\e[36m"
-            when 'darcs'
-                scm_code = "\e[35m"
-        end
+        scm_code = p.scm_color
         p['bugs'].each_with_index do |b, i|
             print "...\e[1m#{scm_code}#{p['name']}\e[0m"
             (hghst-p['name'].size+4).times do |tm|
