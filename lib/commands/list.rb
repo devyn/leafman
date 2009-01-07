@@ -5,20 +5,8 @@ Leafman::Command.new "list", "[category]", "list of all categories / projects" d
         puts "\e[1m#{cat[0]} listing\e[0m"
         cat[0] = nil if cat[0] == 'general'
         Leafman::Projects.each do |p|
-            next unless p['category'] == cat[0]
-            scm_code = ''
-            case p['scm']
-                when 'git'
-                    scm_code = "\e[32m"
-                when 'svn'
-                    scm_code = "\e[34m"
-                when 'bzr'
-                    scm_code = "\e[33m"
-                when 'hg'
-                    scm_code = "\e[36m"
-                when 'darcs'
-                    scm_code = "\e[35m"
-            end
+            next unless (p['category'] == cat[0]) or (cat[0] == 'all')
+            scm_code = p.scm_color
             fetchable = false
             case p['scm']
                 when 'git'

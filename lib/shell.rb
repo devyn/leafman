@@ -19,19 +19,7 @@ module Leafman
     end
     def run_input
       cp_color_code = ""
-      case @current_project['scm']
-      when 'git'
-        cp_color_code = "\e[32m"
-      when 'svn'
-        cp_color_code = "\e[34m"
-      when 'bzr'
-        cp_color_code = "\e[33m"
-      when 'hg'
-        cp_color_code = "\e[36m"
-      when 'darcs'
-        cp_color_code = "\e[35m"
-      end if @current_project
-      Leafman.print "#{cp_color_code}#{@current_project ? @current_project['name'] : nil}\e[0m \e[1m>>\e[0m "
+      Leafman.print "#{cp_color_code}#{@current_project ? @current_project.scm_color + @current_project['name'] : nil}\e[0m \e[1m>>\e[0m "
       line = Readline.readline
       return if !line or line.empty?
       Readline::HISTORY.push line

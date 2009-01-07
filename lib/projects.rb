@@ -15,6 +15,20 @@ module Leafman
             def ro_hash
                 YAML.load(File.read(conf_file_path))
             end
+            def scm_color
+                case self['scm']
+                    when 'git'
+                        return "\e[32m"
+                    when 'svn'
+                        return "\e[34m"
+                    when 'bzr'
+                        return "\e[33m"
+                    when 'hg'
+                        return "\e[36m"
+                    when 'darcs'
+                        return "\e[35m"
+                end
+            end
             def []=(k,v)
                 y = ro_hash
                 r = y[k]=v
