@@ -27,6 +27,8 @@ module Leafman
                         return "\e[36m"
                     when 'darcs'
                         return "\e[35m"
+                    else
+                        return ""
                 end
             end
             def []=(k,v)
