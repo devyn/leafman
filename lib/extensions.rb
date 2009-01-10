@@ -21,7 +21,12 @@ module Leafman
     def parse_args(*argv)
         @config = {}
         load_conf rescue warn("\e[33mcouldn't load the config file; ignore this if you are running INIT\e[0m")
-        c = get_command(argv.shift)
+        cn = argv.shift
+        if cn.empty?
+	    c = get_command('help')
+	else
+            c = get_command(cn)
+	end
         return warn("\e[31m\e[1minvalid command\e[0m") unless c
         c.block.call(*argv) rescue puts("\e[1m\e[31mERROR: \e[0m\e[31m#{$!.message}\e[0m")
         save_conf
