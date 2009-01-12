@@ -5,7 +5,7 @@ module Leafman::Mixin
         puts "*** \e[1m#{s}\e[0m ***"
     end
     def task s
-        puts ":: \e[32m\e[1m#{s}\e[0m"
+        puts ":: \e[36m\e[1m#{s}\e[0m"
     end
     def command s
         puts ">>     \e[33m#{s}\e[0m"
@@ -18,5 +18,8 @@ module Leafman::Mixin
     end
     def list_item s, bullet="**"
         puts "\e[1m#{bullet}\e[0m        #{s}"
+    end
+    def finished
+        puts ":: \e[32m\e[1mdone!\e[0m"
     end
 end
