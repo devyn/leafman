@@ -11,10 +11,10 @@ module Leafman::Mixin
         puts ">>     \e[33m#{s}\e[0m"
     end
     def warning s
-        puts "!!     \e[1m\e[33m#{s}\e[0m"
+        warn "!!     \e[1m\e[33m#{s}\e[0m"
     end
     def error s
-        puts "!! \e[1m\e[31m#{s}\e[0m"
+        warn "!! \e[1m\e[31m#{s}\e[0m"
     end
     def list_item s, bullet="**"
         puts "\e[1m#{bullet}\e[0m        #{s}"
