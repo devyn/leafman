@@ -15,6 +15,7 @@ require 'lib/configs'
 require 'lib/servlet'
 require 'lib/detection'
 require 'lib/shell'
+require 'lib/pretty'
 Dir.glob(File.join(File.dirname(File.expand_path(__FILE__)), 'lib', 'commands', '*.rb')).sort.each do |cf|
     load cf
 end
