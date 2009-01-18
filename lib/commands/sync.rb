@@ -1,34 +1,35 @@
 require 'lib/synkage'
 Leafman::Command.new "sync", "[project-names...]", "syncs all enabled projects or [project-names...] with the server" do |*pnames|
     include Leafman::Mixin
+    title "syncing projects"
     Leafman::Projects.each(*pnames) do |p|
         if (p['scm'] == 'git') and p['fetch']
-            puts "\e[1msync:\e[0m \e[32m#{p['name']}\e[0m"
+            task "sync: \e[32m#{p['name']}\e[0m"
             Dir.chdir(p.dir) do
-                system("git", "pull", p['fetch'], "master") or warn("\e[31m\e[1mcould not pull for\e[0m \e[32m#{p['name']}\e[0m")
+                system("git", "pull", p['fetch'], "master") or error("could not pull for #{p['name']}")
             end
         elsif (p['scm'] == 'svn') and p['do_update']
-            puts "\e[1msync:\e[0m \e[34m#{p['name']}\e[0m"
+            task "sync: \e[34m#{p['name']}\e[0m"
             Dir.chdir(p.dir) do
-                system("svn", "up") or warn("\e[31m\e[1mcould not update\e[0m \e[32m#{p['name']}\e[0m")
+                system("svn", "up") or error("could not update #{p['name']}")
             end
         elsif (p['scm'] == 'bzr') and p['do_update']
-            puts "\e[1msync:\e[0m \e[33m#{p['name']}\e[0m"
+            task "sync: \e[33m#{p['name']}\e[0m"
             Dir.chdir(p.dir) do
-                system("bzr", "up") or warn("\e[31m\e[1mcould not update\e[0m \e[33m#{p['name']}\e[0m")
+                system("bzr", "up") or error("could not update #{p['name']}")
             end
         elsif (p['scm'] == 'hg') and p['do_pull']
-            puts "\e[1msync:\e[0m \e[36m#{p['name']}\e[0m"
+            task "sync: \e[36m#{p['name']}\e[0m"
             Dir.chdir(p.dir) do
-                system("hg", "pull") and system("hg", "update") or warn("\e[31m\e[1mcould not pull for\e[0m \e[36m#{p['name']}\e[0m")
+                system("hg", "pull") and system("hg", "update") or error("could not pull for #{p['name']}")
             end
         elsif (p['scm'] == 'darcs') and p['do_pull']
-            puts "\e[1msync:\e[0m \e[35m#{p['name']}\e[0m"
+            task "sync: \e[35m#{p['name']}\e[0m"
             Dir.chdir(p.dir) do
-                system("darcs", "pull", '-a') or warn("\e[31m\e[1mcould not pull for\e[0m \e[35m#{p['name']}\e[0m")
+                system("darcs", "pull", '-a') or error("could not pull for #{p['name']}")
             end
         elsif p['synkage_url']
-            puts "\e[1msync:\e[0m #{p['name']}\e[0m"
+            task "sync: \e[0m#{p['name']}"
             sy = Synkage.new(p['synkage_url'], p.dir)
             puts "fetching a list of all files on server..."
             ws = sy.fetch_whats - ['.leafman-project']
