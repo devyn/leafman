@@ -1,8 +1,10 @@
 Leafman::Command.new "create", "<project-name>", "create a new project called <project-name>" do |pname|
     include Leafman::Mixin
-    puts "\e[1mcreate:\e[0m #{pname}"
-    FileUtils.mkdir_p File.join(File.expand_path(Leafman::PROJECT_DIR), pname), :verbose => true
-    puts "\e[1mcreate project config\e[0m"
+    title "create: #{pname}"
+    pdir = File.join(File.expand_path(Leafman::PROJECT_DIR), pname)
+    command "mkdir -p \"#{pdir}\""
+    FileUtils.mkdir_p pdir
+    task "create project config"
     Leafman::Projects.add(pname, 'scm' => nil, 'type' => nil)
-    puts "\e[32m\e[1mdone!\e[0m"
+    finished
 end
