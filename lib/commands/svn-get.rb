@@ -1,9 +1,9 @@
 Leafman::Command.new "svn-get", "<project-name> <svn-url>", "checkout the Subversion project called <project-name> at <svn-url>" do |pname, svn_url|
     include Leafman::Mixin
-    puts "\e[1msvn-get:\e[0m #{pname} \e[1mfrom:\e[0m #{svn_url}"
-    puts "\e[1mcheckout\e[0m #{svn_url} \e[1minto\e[0m #{File.join(File.expand_path(Leafman::PROJECT_DIR), pname)}"
-    return warn("\e[31m\e[1msvn checkout failed.\e[0m") unless system("svn", "checkout", svn_url, File.join(File.expand_path(Leafman::PROJECT_DIR), pname))
-    puts "\e[1mcreate project config\e[0m"
+    title "svn-get: #{pname} from: #{svn_url}"
+    task "checkout #{svn_url} into #{File.join(File.expand_path(Leafman::PROJECT_DIR), pname)}"
+    return error("svn checkout failed.") unless system("svn", "checkout", svn_url, File.join(File.expand_path(Leafman::PROJECT_DIR), pname))
+    task "create project config"
     Leafman::Projects.add(pname, 'type' => nil, 'scm' => 'svn', 'do_update' => true)
-    puts "\e[32m\e[1mdone!\e[0m"
+    finished
 end
