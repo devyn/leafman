@@ -2,7 +2,7 @@ require 'set'
 Leafman::Command.new "list", "[category]", "list of all categories / projects" do |*cat|
     include Leafman::Mixin
     if cat[0]
-        puts "\e[1m#{cat[0]} listing\e[0m"
+        title "#{cat[0]} listing"
         cat[0] = nil if cat[0] == 'general'
         Leafman::Projects.each do |p|
             next unless (p['category'] == cat[0]) or (cat[0] == 'all')
@@ -33,16 +33,16 @@ Leafman::Command.new "list", "[category]", "list of all categories / projects" d
             else
                 eestr = '**'
             end
-            puts "\e[1m#{eestr}\e[0m\t#{scm_code}#{p['name']}\e[0m"
+            list_item "#{scm_code}#{p['name']}\e[0m", eestr
         end
     else
-        puts "\e[1mcategory listing\e[0m"
+        title "category listing"
         categories = Set.new
         Leafman::Projects.each do |p|
             categories << (p['category'] or 'general')
         end
         categories.sort.each do |c|
-            puts "\e[1m*\e[0m\t#{c}"
+            list_item c, '*'
         end
     end
 end
