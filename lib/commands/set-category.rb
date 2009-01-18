@@ -2,6 +2,6 @@ Leafman::Command.new "set-category", "<project-name> <category>", "set the categ
     include Leafman::Mixin
     cat = nil if cat == 'general'
     p = Leafman::Projects.find(pname)
-    warn("\e[1m\e[31mproject not found.\e[0m")||true&&next unless p
+    error("project not found.")||true&&next unless p
     p['category'] = cat
 end
