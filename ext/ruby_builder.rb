@@ -1,11 +1,18 @@
+class String
+    def make_string
+        chomp + "\n"
+    end
+end
 class RubyBuilder
     class CodeBlock
         def initialize(hsh={})
+            cbinit
             hsh[:contents] ||= []
             hsh.each do |k,v|
                 self.instance_variable_set "@#{k}", v
             end
         end
+        def cbinit; end
         def type
             self.class.type
         end
@@ -60,19 +67,22 @@ class RubyBuilder
     end
     class IfBlock < CodeBlock
         attr_accessor :condition, :elseif_blocks, :else_block
+        def cbinit
+            @elseif_blocks = []
+        end
         def make_string
             s = ""
-            s << "if #{condition.make_string.chomp}\n"
+            s << "if#{' '+condition.make_string.chomp unless condition.empty?}\n"
             contents.each do |c|
                 s << c.make_string.gsub(/^/, "    ")
             end
             if elseif_blocks
                 elseif_blocks.each do |if_blk|
-                    s << if_blk.make_string.sub(/^if/, "elsif").gsub(/^/, "    ").sub(/^    /, "")
+                    s << if_blk.make_string.sub(/^if/, "elsif").sub(/end\n$/m, '')
                 end
             end
             if else_block
-                s << else_block.sub(/^if/, "else").gsub(/^/, "    ").sub(/^    /, "")
+                s << else_block.make_string.sub(/^if/, "else").sub(/end\n$/m, '')
             end
             s << "end\n"
         end
@@ -81,8 +91,8 @@ class RubyBuilder
         attr_accessor :argument_names, :to
         def make_string
             s = ""
-            s << "#{to.make_string} do"
-            s << " |#{argument_names.join(", ")}|"
+            s << "#{to.make_string.chomp} do"
+            s << " |#{argument_names.join(", ")}|" if argument_names
             s << "\n"
             contents.each do |c|
                 s << c.make_string.gsub(/^/, "    ")
@@ -90,29 +100,61 @@ class RubyBuilder
             s << "end\n"
         end
     end
+    class TryBlock < CodeBlock
+        attr_accessor :catches, :finally
+        def cbinit
+            @catches = []
+        end
+        def make_string
+            s = ""
+            s << "begin\n"
+            contents.each do |c|
+                s << c.make_string.gsub(/^/, "    ")
+            end
+            if catches
+                catches.each do |c|
+                    s << c.make_string
+                end
+            end
+            if finally
+                s << "ensure\n"
+                finally.contents.each do |fs|
+                    s << fs.make_string.gsub(/^/, "    ")
+                end
+            end
+            s << "end\n"
+        end
+    end
+    class CatchBlock < CodeBlock
+        attr_accessor :exception
+        def cbinit
+            @exception = ""
+        end
+        def make_string
+            s = ""
+            s << "rescue #{exception.make_string}"
+            contents.each do |c|
+                s << c.make_string.gsub(/^/, "    ")
+            end
+            s
+        end
+    end
     class VariableAssignment
         attr_accessor :name, :assignment
-        def initialize(hsh)
-            hsh[:assignment] ||= "nil"
-            hsh.each do |k,v|
-                self.instance_variable_set("@#{k}", v)
-            end
+        def cbinit
+            @assignment = 'nil'
         end
         def make_string
             "#{name} = #{assignment.chomp}\n"
         end
     end
-    class LOC < String
-        def make_string
-            chomp + "\n"
-        end
-    end
     
     attr_accessor :contents
-    def initialize(wrapping=nil)
+    def initialize(wrapping=nil, &blk)
         @wrapping = wrapping
         @wrapping ||= self
         @contents = []
+        self.instance_eval &blk if block_given?
     end
     def build
         @wrapping.contents.collect{|l|l.make_string}.join
@@ -135,14 +177,18 @@ class RubyBuilder
         wrp.instance_eval &blk
         @wrapping.contents << mt
     end
+    def block action, argument_names=nil, &blk
+        bk = DoBlock.new(:to => action, :argument_names => argument_names)
+        wrp = self.class.new(bk)
+        wrp.instance_eval &blk
+        @wrapping.contents << bk
+    end
+    alias with block
     def <<(this)
-        @wrapping.contents << LOC.new(this)
+        @wrapping.contents << this
     end
     def comment(c)
         self << "# #{c}"
-    end
-    def code(this)
-        LOC.new(this)
     end
     def conditional(condition, &blk)
         ib = IfBlock.new(:condition => condition)
@@ -168,5 +214,27 @@ class RubyBuilder
     end
     def set(name, value)
         @wrapping.contents << VariableAssignment.new(:name => name, :assignment => value)
+    end
+    def try &blk
+        tb = TryBlock.new
+        wrp = self.class.new(tb)
+        wrp.instance_eval &blk
+        @wrapping.contents << tb
+    end
+    def catch exception, &blk
+        if @wrapping.is_a? TryBlock
+            cb = CatchBlock.new(:exception => exception)
+            wrp = self.class.new(cb)
+            wrp.instance_eval &blk
+            @wrapping.catches << cb
+        end
+    end
+    def finally &blk
+        if @wrapping.is_a? TryBlock
+            fb = TryBlock.new
+            wrp = self.class.new(fb)
+            wrp.instance_eval &blk
+            @wrapping.finally = fb
+        end
     end
 end
