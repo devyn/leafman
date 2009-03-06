@@ -49,5 +49,5 @@ Leafman::Command.new "sync", "[project-names...]", "syncs all enabled projects o
             next
         end
     end
-    puts "\e[32m\e[1mdone!\e[0m"
+    finished
 end
