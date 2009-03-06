@@ -18,11 +18,8 @@ Leafman::Command.new "commit-release", "<project-name> <name|version> <summary> 
         error("not available for any SCM other than Git, Subversion, Bazzar, Mercurial, or Darcs.")||true&&next
     end
     case p['scm']
-    when 'git'
-        command "git tag -m \"...\" #{name_or_version}"
-        system 'git', 'tag', '-m', "release: #{name_or_version}", name_or_version
     # sorry, no subversion
-    when 'bzr', 'hg', 'darcs'
+    when 'git', 'bzr', 'hg', 'darcs'
         command "#{p['scm']} tag #{name_or_version}"
         system p['scm'], 'tag', name_or_version
     end
