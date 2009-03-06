@@ -9,7 +9,6 @@ module Leafman
       self['scm'] = 'hg'    if File.directory?(dir('.hg'   ))
       self['scm'] = 'darcs' if File.directory?(dir('_darcs'))
       # detect TYPE
-      erb   = 0
       rb    = 0
       py    = 0
       java  = 0
@@ -23,8 +22,6 @@ module Leafman
         (Dir.entries(d) - %w(. .. .git .svn .bzr .hg _darcs)).each do |e|
           if File.file?(File.join(d, e))
             case e.split('.').last.downcase
-              when 'erb'
-                erb   += 1
               when 'rb'
                 rb    += 1
               when 'py'
@@ -48,7 +45,7 @@ module Leafman
         end
       end
       goproc.call dir
-      self['type'] = {'rails' => erb, 'ruby' => rb, 'python' => py, 'java' => java, 'javascript' => js, 'perl' => pl, 'c' => c, 'c++' => cpp, nil => other}.sort{|a1,a2|a2[1] <=> a1[1]}.first[0]
+      self['type'] = {'ruby' => rb, 'python' => py, 'java' => java, 'javascript' => js, 'perl' => pl, 'c' => c, 'c++' => cpp, nil => other}.sort{|a1,a2|a2[1] <=> a1[1]}.first[0]
       # detect SYNC.
       case self['scm']
         when 'git'
