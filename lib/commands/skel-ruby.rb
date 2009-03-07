@@ -1,6 +1,6 @@
 class String
     def rubyize
-        self.gsub('/', '::').gsub(/^./){|rc| rc.upcase}.gsub(/_./){|rc| rc.upcase}.gsub(/::./){|rc| rc.upcase}
+        self.gsub('/', '::').gsub(/^./){|rc| rc.upcase}.gsub(/_(.)/){$1.upcase}.gsub(/::./){|rc| rc.upcase}
     end
 end
 Leafman::Command.new "skel-ruby", "<project-name> [classes...]", "generate a Ruby skeleton (with class skeletons) for <project-name>, then set the 'type' accordingly" do |pname, *classes|
