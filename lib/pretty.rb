@@ -28,4 +28,13 @@ module Leafman::Mixin
     def finished
         puts ":: \e[32m\e[1mdone!\e[0m"
     end
+    def run_command c, *a
+        command [c, *a].collect{|sg| sg.include?(" ") ? "\"#{sg}\"" : sg}.collect{|sg|(sg.size > 50)||(sg.include?("\n")) ? '...' : sg}.join(" ")
+        IO.popen([c, *a].collect{|sg|"\"#{sg.gsub("\\", "\\\\").gsub("\"", "\\\"")}\""}.join(" "), 'r') do |pr|
+            pr.each_line do |ln|
+                log ln
+            end
+        end
+        $?.success?
+    end
 end

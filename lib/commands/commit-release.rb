@@ -9,19 +9,16 @@ Leafman::Command.new "commit-release", "<project-name> <name|version> <summary> 
     end
     case p['scm']
     when 'git', 'svn', 'bzr', 'hg'
-        command "#{p['scm']} commit -m ..."
-        system p['scm'], 'commit', '-m', msg
+        (error("command execution failed"); next) unless run_command(p['scm'], 'commit', '-m', msg)
     when 'darcs'
-        command "darcs record -m ..."
-        system 'darcs', 'record', '-m', msg
+        (error("command execution failed"); next) unless run_command('darcs', 'record', '-m', msg)
     else
-        error("not available for any SCM other than Git, Subversion, Bazzar, Mercurial, or Darcs.")||true&&next
+        error("not available for any SCM other than Git, Subversion, Bazzar, Mercurial, or Darcs."); next
     end
     case p['scm']
     # sorry, no subversion
     when 'git', 'bzr', 'hg', 'darcs'
-        command "#{p['scm']} tag #{name_or_version}"
-        system p['scm'], 'tag', name_or_version
+        (error("command execution failed"); next) unless run_command(p['scm'], 'tag', name_or_version)
     end
     msg.each_line{|ln|log ln}
     finished
