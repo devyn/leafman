@@ -1,6 +1,7 @@
 # Unified color scheme for Leafman.
 # Edit as you wish.
 module Leafman::Mixin
+    extend self
     def title s
         puts ":: \e[34m\e[1m#{s}\e[0m"
     end
@@ -8,7 +9,7 @@ module Leafman::Mixin
         puts ":: \e[36m\e[1m#{s}\e[0m"
     end
     def command s
-        puts ">>     \e[33m#{s}\e[0m"
+        puts ">>     \e[1m\e[33m#{s}\e[0m"
     end
     def warning s
         warn "!!     \e[1m\e[33m#{s}\e[0m"
@@ -22,6 +23,9 @@ module Leafman::Mixin
     def log s
         puts "::     #{s}"
     end
+    def command_log s
+        puts "::         \e[33m#{s}\e[0m"
+    end
     def ask s
         puts "??     \e[36m#{s}\e[0m"
     end
@@ -32,7 +36,7 @@ module Leafman::Mixin
         command [c, *a].collect{|sg| sg.include?(" ") ? "\"#{sg}\"" : sg}.collect{|sg|(sg.size > 50)||(sg.include?("\n")) ? '...' : sg}.join(" ")
         IO.popen([c, *a].collect{|sg|"\"#{sg.gsub("\\", "\\\\").gsub("\"", "\\\"")}\""}.join(" "), 'r') do |pr|
             pr.each_line do |ln|
-                log ln
+                command_log ln.chomp
             end
         end
         $?.success?
