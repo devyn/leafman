@@ -25,7 +25,7 @@ Leafman::Command.new "show", "<project-name>", "show everything known about the 
         list_item "uses \e[35mDarcs\e[0m#{", pushes" if p['do_push']}#{", syncs" if p['do_pull']}.", '...'
         # HELP! I need Darcs revision detecting code!
     else
-        list_name "doesn't have version control#{", syncs" if p['synkage_url']}.", '...'
+        list_item "doesn't have version control#{", syncs" if p['synkage_url']}.", '...'
     end
     list_item "is a #{p['type'].capitalize} project.", '...' if p['type']
     p['bugs'].each_with_index do |b, i|
