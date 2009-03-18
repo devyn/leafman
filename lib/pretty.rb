@@ -3,7 +3,11 @@
 module Leafman::Mixin
     extend self
     def title s
+        self.xterm_title = "Leafman - #{s}"
         puts ":: \e[34m\e[1m#{s}\e[0m"
+    end
+    def xterm_title= s
+        print "\033]0;#{s}\007"
     end
     def task s
         puts ":: \e[36m\e[1m#{s}\e[0m"

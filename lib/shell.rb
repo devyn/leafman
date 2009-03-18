@@ -18,6 +18,7 @@ module Leafman
       # other stop  code...
     end
     def run_input
+      Leafman::Mixin.xterm_title = "Leafman - Shell"
       cp_color_code = ""
       Leafman.print "#{cp_color_code}#{@current_project ? @current_project.scm_color + @current_project['name'] : nil}\e[0m \e[1m>>\e[0m "
       line = Readline.readline
