@@ -74,6 +74,17 @@ module Leafman
                 yield p if p
             end
         end
+        def each_with_index(*ns)
+            ns = names if ns.empty?
+            ns.sort.each_with_index do |pname,ind|
+                p = find pname
+                yield p, ind if p
+            end
+        end
+        def count(*ns)
+            ns = names if ns.empty?
+            ns.sort.collect{|pname|find pname}.select{|i|i}.count
+        end
         def names
             Dir.glob(File.join(File.expand_path(PROJECT_DIR), '.leafman', "*.yml")).collect{|n|n.sub(/^#{Regexp.escape(File.join(File.expand_path(PROJECT_DIR), '.leafman'))}\//, '').sub(/\.yml$/, '')}
         end
