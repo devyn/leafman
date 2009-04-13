@@ -31,6 +31,22 @@ module Leafman
                         return "\e[0m"
                 end
             end
+            def scm_color_shoes
+                case self['scm']
+                when 'git'
+                    return [0,180,0]
+                when 'svn'
+                    return [0,0,180]
+                when 'bzr'
+                    return [180,180,0]
+                when 'hg'
+                    return [0,180,180]
+                when 'darcs'
+                    return [180,0,180]
+                else
+                    return [180,180,180]
+                end
+            end
             def []=(k,v)
                 y = ro_hash
                 r = y[k]=v
