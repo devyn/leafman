@@ -15,6 +15,10 @@ class LeafmanGUI < Shoes
     url '/sync/(.+)', :sync
     url '/list', :list
     url '/show/(.+)', :show
+    url '/edit/(.+)', :edit
+    url '/destroy/(.+)', :destroy
+    url '/initSCM/(.+)', :initSCM
+    url '/taskManager/(.+)', :taskManager
     def layout(where)
         background lime..black
         title link("Leafman", :click => '/', :stroke => black)
@@ -28,6 +32,7 @@ class LeafmanGUI < Shoes
             border rgb(0,0,0,0.5)..rgb(140,140,140,0.5), :strokewidth => 4, :angle => 45
             caption '- ', link('List', :click => '/list', :stroke => green)
             caption '- ', link('Sync', :click => '/sync', :stroke => green)
+            flow { caption '-'; @el_create = edit_line :width => 0.4; caption link('Create', :click => proc { pname = @el_create.text; FileUtils.mkdir_p(File.join(File.expand_path(Leafman::PROJECT_DIR), pname)); Leafman::Projects.add(pname, 'scm' => nil, 'type' => nil); visit "/show/#{URI.escape(pname)}" }, :stroke => green) }
         end
     end
     def sync(select=nil)
@@ -39,13 +44,13 @@ class LeafmanGUI < Shoes
                 @syncStack.clear do
                     background rgb(255,255,255,0.5)
                     border rgb(0,0,0,0.5)..rgb(140,140,140,0.5), :strokewidth => 4, :angle => 45
-                    caption "Syncing all projects...", :emphasis => 'italic'
+                    caption "Syncing #{select ? URI.unescape(select) : 'all projects'}...", :emphasis => 'italic'
                     @cp = title "None", :weight => 'bold', :align => 'center'
                     @cc = para "Starting Sync...", :font => 'monospace', :align => 'center'
                     @pg = progress :width => 1.0, :height => 0.1
                     flow(:bottom => 0, :width => 1.0, :height => 0.1) {background black; @cbx = para "Starting Sync...", :font => 'monospace', :stroke => white}
                     cnt = Leafman::Projects.count.to_f
-                    button "Abort", :right => 0, :top => 0 do
+                    @abb = button "Abort", :right => 0, :top => 0 do
                         @kt.kill
                         visit '/'
                     end
@@ -97,6 +102,7 @@ class LeafmanGUI < Shoes
                         @cc.replace "Done!"
                         @cbx.replace ""
                         @pg.fraction = 1.0
+                        @abb.hide
                     end
                 end
             end
@@ -142,26 +148,126 @@ class LeafmanGUI < Shoes
         stack :width => 0.5, :height => 0.5, :left => 0.25, :top => 0.25, :scroll => true do
             background rgb(0,0,0,0.5)
             border rgb(255,255,255,0.5)..rgb(116,116,116,0.5), :strokewidth => 4, :angle => 45
-            subtitle p['name'], :stroke => rgb(*p.scm_color_shoes)
-            flow :right => 0, :top => 0 do
-                case p['scm']
-                when 'git'
-                    #para link("push", :stroke => orange, :click => "/push/#{select}"), :align => 'right' if p['do_push']
-                    para link("sync", :stroke => orange, :click => "/sync/#{select}"), :align => 'right' if p['fetch']
-                when 'svn','bzr'
-                    #para link("push", :stroke => orange, :click => "/push/#{select}"), :align => 'right' if p['do_push']
-                    para link("sync", :stroke => orange, :click => "/sync/#{select}"), :align => 'right' if p['do_update']
-                when 'hg','darcs'
-                    #para link("push", :stroke => orange, :click => "/push/#{select}"), :align => 'right' if p['do_push']
-                    para link("sync", :stroke => orange, :click => "/sync/#{select}"), :align => 'right' if p['do_pull']
-                else
-                    para link("sync", :stroke => orange, :click => "/sync/#{select}"), :align => 'right' if p['synkage_url']
+            stack(:width => 0.9, :left => 4, :top => 4) do
+                para " " # divider
+                subtitle p['name'], :stroke => rgb(*p.scm_color_shoes)
+                flow :right => 0, :top => 0 do
+                    case p['scm']
+                    when 'git'
+                        para link("sync", :stroke => orange, :click => "/sync/#{select}"), :align => 'right' if p['fetch']
+                    when 'svn','bzr'
+                        para link("sync", :stroke => orange, :click => "/sync/#{select}"), :align => 'right' if p['do_update']
+                    when 'hg','darcs'
+                        para link("sync", :stroke => orange, :click => "/sync/#{select}"), :align => 'right' if p['do_pull']
+                    else
+                        para link("sync", :stroke => orange, :click => "/sync/#{select}"), :align => 'right' if p['synkage_url']
+                    end
+                    if p['scm']
+                        #para link("push", :stroke => orange, :click => "/push/#{select}"), :align => 'right' if p['do_push']
+                        #para link("commit", :stroke => orange, :click => "/commit/#{select}"), :align => 'right'
+                    end
+                    para link("edit", :stroke => orange, :click => "/edit/#{select}"), :align => 'right'
+                    para link("destroy", :stroke => orange, :click => proc { visit "/destroy/#{select}" if confirm("Are you sure? This will remove all the project's files too!") }), :align => 'right'
+                    para link("task manager", :stroke => orange, :click => "/taskManager/#{select}"), :align => 'right'
                 end
-                #para link("edit", :stroke => orange, :click => "/edit/#{select}"), :align => 'right'
-                #para link("destroy", :stroke => orange, :click => proc { visit "/destroy/#{select}" if confirm("Are you sure? This will remove all the project's files too!") }), :align => 'right'
+                if d = p['description']
+                    inscription d, :emphasis => 'italic', :stroke => yellow
+                end
             end
-            if d = p['description']
-                inscription d, :emphasis => 'italic', :stroke => yellow
+        end
+    end
+    def edit(select)
+        layout %|edit|
+        p = Leafman::Projects.find(URI.unescape(select))
+        stack(:width => 1.0, :height => 0.8, :bottom => 0, :left => 0, :scroll => true) do
+            background rgb(0,0,0,0.5)
+            title p['name'], :stroke => rgb(*p.scm_color_shoes)
+            flow do
+                para strong("SCM: "), :stroke => white
+                if p['scm']
+                    para em(p.full_scm_name), :stroke => rgb(*p.scm_color_shoes)
+                else
+                    para em("None "), link("change", :stroke => orange, :click => "/initSCM/#{select}"), :stroke => rgb(*p.scm_color_shoes)
+                end
+            end
+            flow :height => 0.2 do
+                para strong("Description: "), :stroke => white
+                edit_box p['description']||"", :width => 0.5, :height => 1.0 do |box|
+                    p['description'] = box.text
+                end
+            end
+            flow do
+                para strong("Type: "), :stroke => white
+                if p['type']
+                    para em(p['type']), :stroke => white
+                    #para link("redetect", :stroke => orange, :click => proc { p.detect; alert "Redetection complete. Type decided: #{p['type']}"; visit "/show/#{select}" })
+                else
+                    para em("None"), :stroke => white
+                    #para link("detect", :stroke => orange, :click => proc { p.detect; alert "Redetection complete. Type decided: #{p['type']}"; visit "/show/#{select}" })
+                end
+            end
+            flow do
+                para link("visit task manager", :stroke => orange, :click => "/taskManager/#{select}")
+            end
+            button "Back", :right => 0, :bottom => 0 do
+                visit "/show/#{select}"
+            end
+        end
+    end
+    def destroy(select)
+        layout %|destroy|
+        p = Leafman::Projects.find(URI.unescape(select))
+        flow(:top => 0.3) { subtitle "Destroying project #{p['name']}", :emphasis => 'italic' }
+        Thread.start do
+            sleep 0.5
+            FileUtils.rm_rf p.dir
+            FileUtils.rm p.conf_file_path
+            visit '/'
+        end
+    end
+    def initSCM(select)
+        layout %|initialize SCM|
+        p = Leafman::Projects.find(URI.unescape(select))
+        init = proc do |gsbhd|
+            Dir.chdir(p.dir) do
+                successful = true
+                case gsbhd
+                when 'git'
+                    system 'git init' or (alert("failed to initialize."); successful = false)
+                when 'bzr'
+                    system 'bzr init' or (alert("failed to initialize."); successful = false)
+                when 'hg'
+                    system 'hg init' or (alert("failed to initialize."); successful = false)
+                when 'darcs'
+                    system 'darcs initialize' or (alert("failed to initialize."); successful = false)
+                end
+                p['scm'] = gsbhd if successful
+                visit "/show/#{select}"
+            end
+        end
+        stack(:height => 0.5, :width => 0.5, :top => 0.25, :left => 0.25) do
+            para "Select an SCM"
+            caption link("Git", :stroke => rgb(0, 140, 0), :click => proc{init.call('git')})
+            caption link("Bazaar", :stroke => rgb(140, 140, 0), :click => proc{init.call('bzr')})
+            caption link("Mercurial", :stroke => rgb(0, 140, 140), :click => proc{init.call('hg')})
+            caption link("Darcs", :stroke => rgb(140, 0, 140), :click => proc{init.call('darcs')})
+        end
+    end
+    def taskManager(select)
+        layout %|task manager|
+        p = Leafman::Projects.find(URI.unescape(select))
+        stack(:width => 1.0, :height => 0.8, :bottom => 0, :left => 0, :scroll => true) do
+            background rgb(0,0,0,0.5)
+            flow { subtitle "Tasks", :stroke => cyan; caption link("add", :stroke => white, :click => proc { t = ask("What shall this task be?"); p['todos'] ||= []; p['todos'] += [t]; visit "/taskManager/#{select}" }) }
+            p['todos'].each_with_index do |td,ind|
+                flow { inscription td, "    ", link('complete', :stroke => black, :click => proc { (tds = p['todos']).delete_at ind; p['todos'] = tds; visit "/taskManager/#{select}" }), :stroke => yellow }
+            end if p['todos']
+            flow { subtitle "Bugs", :stroke => cyan; caption link("add", :stroke => white, :click => proc { b = ask("What shall this bug be?"); p['bugs'] ||= []; p['bugs'] += [b]; visit "/taskManager/#{select}" }) }
+            p['bugs'].each_with_index do |td,ind|
+                flow { inscription td, "    ", link('complete', :stroke => black, :click => proc { (bgs = p['bugs']).delete_at ind; p['bugs'] = bgs; visit "/taskManager/#{select}" }), :stroke => red }
+            end if p['bugs']
+            button "Back", :bottom => 0, :right => 0 do
+                visit "/show/#{select}"
             end
         end
     end

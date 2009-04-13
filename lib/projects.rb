@@ -47,6 +47,9 @@ module Leafman
                     return [180,180,180]
                 end
             end
+            def full_scm_name
+                {'git'=>'Git','svn'=>'Subversion','bzr'=>'Bazaar','hg'=>'Mercurial','darcs'=>'Darcs',nil=>'None'}[self['scm']]
+            end
             def []=(k,v)
                 y = ro_hash
                 r = y[k]=v
